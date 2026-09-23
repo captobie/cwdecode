@@ -11,6 +11,8 @@ A macOS app that decodes Morse code (CW) from live audio or recordings.
 
 Speed (WPM) is detected automatically, including Farnsworth-spaced code.
 
+- **Smart Cleanup** (toolbar wand) runs the decoded text through Apple's on-device language model to fix typical decoder errors: stray `E`s and `T`s, split callsigns (`DL2A BC`), and near-miss Q-codes (`QTEI` → `QTH`). The raw text stays on top; the cleaned text is below it, with changed words underlined and words the model was unsure of in orange. Copy copies the cleaned text. It needs macOS 26 or later and Apple Intelligence turned on; otherwise the toggle is disabled (its tooltip says why) and you see only the raw text.
+
 ## Building
 
 Runs on macOS 15 or later. Built and tested with Xcode 27 (Swift 6). The Xcode project is generated from `project.yml`:
@@ -31,7 +33,13 @@ audio ─▶ ToneDetector ─▶ adaptive threshold ─▶ MorseDecoder ─▶ t
           (Goertzel,      (noise floor/peak,     (dit/dah and gap
            12 ms window)   hysteresis, debounce)  clustering)
    └──▶ FrequencyTracker (auto-tune, 5 Hz steps every 250 ms)
+
+text ─▶ CleanupCoordinator ─▶ FoundationModelsCleaner ─▶ CorrectionFilter ─▶ cleaned text
+         (8–30 word windows,    (on-device model, ~1.5 s    (keeps only changes that
+          20 words of context)   a window)                   are plausible in Morse)
 ```
+
+Smart cleanup is a separate, optional layer: the raw decoder text is never modified, and anything that fails leaves that stretch of text raw. Its log is in Console under subsystem `com.carlobermeier.CWDecode`, category `cleanup`.
 
 | Path | Role |
 | --- | --- |
@@ -41,4 +49,8 @@ audio ─▶ ToneDetector ─▶ adaptive threshold ─▶ MorseDecoder ─▶ t
 | `CWDecode/Morse/MorseDecoder.swift` | Timing → characters, adaptive speed |
 | `CWDecode/DSP/PipelineRunner.swift` | Runs the pipeline off the main thread |
 | `CWDecode/Audio/` | Input device list, audio input, and audio file reading |
+| `CWDecode/Cleanup/CleanupCoordinator.swift` | Smart cleanup: windows of complete words, one request at a time, fallback to raw |
+| `CWDecode/Cleanup/FoundationModelsCleaner.swift` | The on-device model: prompt, `@Generable` output, 4K-context budgeting |
+| `CWDecode/Cleanup/CorrectionFilter.swift` | Undoes model changes the decoder's errors can't explain |
+| `CWDecode/Cleanup/HamLexicon.swift`, `MorsePlausibility.swift` | Ham vocabulary and callsigns; distance between texts in dits and dahs |
 | `CWDecode/App/DecoderViewModel.swift` | UI state and actions |
