@@ -1,0 +1,57 @@
+name: CWDecode
+options:
+  bundleIdPrefix: com.carlobermeier
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  CWDecode:
+    type: application
+    platform: macOS
+    sources: [CWDecode]
+    info:
+      path: CWDecode/Info.plist
+      properties:
+        CFBundleDisplayName: CWDecode
+        LSApplicationCategoryType: public.app-category.utilities
+        NSMicrophoneUsageDescription: CWDecode listens to your audio input to decode Morse code transmissions.
+    entitlements:
+      path: CWDecode/CWDecode.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.device.audio-input: true
+        com.apple.security.files.user-selected.read-only: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWDecode
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  CWDecodeTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [CWDecodeTests]
+    dependencies:
+      - target: CWDecode
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWDecodeTests
+        CODE_SIGN_IDENTITY: "-"
+schemes:
+  CWDecode:
+    build:
+      targets:
+        CWDecode: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [CWDecodeTests]
