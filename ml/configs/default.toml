@@ -1,0 +1,65 @@
+# Default conditions for synthetic CW. Every key is optional; omitted keys use the
+# defaults in cwsynth/spec.py (ConditionRanges). Ranges are [low, high].
+
+[conditions]
+sample_rate = 8000
+
+wpm = [8.0, 40.0]                    # log-uniform
+farnsworth_prob = 0.10
+farnsworth_ratio = [0.4, 0.85]       # overall speed / character speed
+rise_ms = [2.0, 8.0]
+max_signal_s = 15.0
+lead_s = [0.2, 1.5]
+tail_s = [0.2, 1.5]
+
+tone_hz = [400.0, 900.0]
+drift_prob = 0.30
+drift_hz = [2.0, 25.0]
+wander_share = 0.5
+chirp_prob = 0.05
+chirp_hz = [5.0, 40.0]
+
+clean_prob = 0.05
+snr_db = [-10.0, 25.0]               # carrier vs noise in 500 Hz
+snr_skew = 1.5                       # >1 weights toward low SNR
+
+qsb_prob = 0.50
+qsb_rate_hz = [0.05, 1.0]            # log-uniform
+qsb_depth_db = [3.0, 25.0]
+
+qrn_prob = 0.30
+qrn_rate_per_s = [0.5, 8.0]
+qrn_level_db = [-6.0, 12.0]
+
+qrm_prob = 0.30
+qrm_max = 2
+qrm_level_db = [-20.0, -3.0]
+qrm_offset_hz = [80.0, 400.0]
+
+rx_filter_prob = 0.50
+cw_filter_share = 0.70
+cw_filter_width_hz = [150.0, 600.0]
+cw_filter_offset_hz = 50.0
+
+empty_duration_s = [1.0, 15.0]
+empty_carrier_prob = 0.30
+empty_carrier_db = [-12.0, 0.0]
+
+gain_peak = [0.25, 0.9]
+
+[conditions.fist_styles]
+machine = 0.15
+paddle = 0.35
+bug = 0.15
+straight = 0.35
+
+[corpus]
+# text_file = "path/to/plain-english.txt"   # replaces the bundled word list
+
+[corpus.weights]
+callsign = 0.20
+qso = 0.30
+abbreviation = 0.15
+english = 0.20
+random = 0.10
+noise = 0.05

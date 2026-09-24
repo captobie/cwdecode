@@ -3,3 +3,10 @@ build/
 DerivedData/
 xcuserdata/
 *.xcuserstate
+
+# ml/
+ml/.venv/
+ml/data/
+__pycache__/
+*.egg-info/
+.pytest_cache/
