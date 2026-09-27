@@ -10,7 +10,21 @@ struct ContentView: View {
         VStack(spacing: 0) {
             SignalStatusBar()
             Divider()
-            DecodedTextView(text: model.decodedText)
+            if model.cleanup.isActive {
+                VSplitView {
+                    TranscriptPane(title: "Raw") {
+                        DecodedTextView(text: model.decodedText, fontSize: 15)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(minHeight: 80)
+                    TranscriptPane(title: "Cleaned", isBusy: model.cleanup.isCleaning) {
+                        CleanedTextView(cleanup: model.cleanup)
+                    }
+                    .frame(minHeight: 120)
+                }
+            } else {
+                DecodedTextView(text: model.decodedText)
+            }
             Divider()
             TuningControls()
         }
@@ -18,6 +32,9 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem {
                 InputDevicePicker()
+            }
+            ToolbarItem {
+                SmartCleanupToggle(cleanup: model.cleanup)
             }
             ToolbarItemGroup {
                 Button {
@@ -42,7 +59,7 @@ struct ContentView: View {
                 } label: {
                     Label("Copy", systemImage: "doc.on.doc")
                 }
-                .help("Copy the decoded text")
+                .help(model.cleanup.isActive ? "Copy the cleaned text" : "Copy the decoded text")
                 .disabled(model.decodedText.isEmpty)
 
                 Button {
@@ -109,24 +126,118 @@ private struct InputDevicePicker: View {
 
 private struct DecodedTextView: View {
     let text: String
+    var fontSize = 20.0
+
+    var body: some View {
+        TranscriptScrollView(fontSize: fontSize) {
+            if text.isEmpty {
+                Text("Click Listen to decode your audio input, or open a recording.")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(text)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+}
+
+/// The cleaned transcript: words the model changed are underlined, words it was unsure of are
+/// orange, and text it hasn't checked (yet) is dimmed.
+private struct CleanedTextView: View {
+    let cleanup: CleanupCoordinator
+
+    var body: some View {
+        TranscriptScrollView(fontSize: 20) {
+            if cleanup.segments.isEmpty, cleanup.unsegmented.isEmpty {
+                Text("Cleaned text appears here as words are decoded.")
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(attributedText)
+                    .textSelection(.enabled)
+            }
+        }
+    }
+
+    private var attributedText: AttributedString {
+        var result = AttributedString()
+        for segment in cleanup.segments {
+            for piece in segment.pieces {
+                var text = AttributedString(piece.text)
+                switch piece.style {
+                case .plain:
+                    break
+                case .unverified:
+                    text.foregroundColor = .secondary
+                case .changed:
+                    text.foregroundColor = .accentColor
+                    text.underlineStyle = .single
+                case .uncertain:
+                    text.foregroundColor = .orange
+                    text.underlineStyle = Text.LineStyle(pattern: .dot)
+                }
+                result += text
+            }
+        }
+        var pending = AttributedString(cleanup.unsegmented)
+        pending.foregroundColor = .secondary
+        return result + pending
+    }
+}
+
+private struct TranscriptScrollView<Content: View>: View {
+    let fontSize: Double
+    @ViewBuilder let content: Content
 
     var body: some View {
         ScrollView {
-            Group {
-                if text.isEmpty {
-                    Text("Click Listen to decode your audio input, or open a recording.")
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text(text)
-                        .textSelection(.enabled)
-                }
-            }
-            .font(.system(size: 20, design: .monospaced))
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            .padding()
+            content
+                .font(.system(size: fontSize, design: .monospaced))
+                .frame(maxWidth: .infinity, alignment: .topLeading)
+                .padding()
         }
         .defaultScrollAnchor(.bottom, for: .sizeChanges)
         .background(Color(nsColor: .textBackgroundColor))
+    }
+}
+
+private struct TranscriptPane<Content: View>: View {
+    let title: String
+    var isBusy = false
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 6) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                Spacer()
+                if isBusy {
+                    ProgressView().controlSize(.mini)
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 4)
+            content
+        }
+    }
+}
+
+private struct SmartCleanupToggle: View {
+    let cleanup: CleanupCoordinator
+
+    var body: some View {
+        Toggle(isOn: Binding(
+            get: { cleanup.isActive },
+            set: { cleanup.isEnabled = $0 }
+        )) {
+            Label("Smart Cleanup", systemImage: "wand.and.sparkles")
+        }
+        .toggleStyle(.button)
+        .disabled(cleanup.availability != .available)
+        .help(cleanup.availability.explanation
+              ?? "Clean up decoding errors with the on-device language model; the raw text stays visible above")
     }
 }
 

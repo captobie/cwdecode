@@ -14,6 +14,9 @@ final class DecoderViewModel {
     private(set) var wpm = 0.0
     private(set) var detectedFrequency: Double
 
+    /// Layer 2: optional on-device language model cleanup of `decodedText`, which stays as received.
+    let cleanup: CleanupCoordinator
+
     var errorMessage: String?
     var isShowingFileImporter = false
 
@@ -64,7 +67,8 @@ final class DecoderViewModel {
         static let inputDeviceName = "inputDeviceName"
     }
 
-    init() {
+    init(cleanup: CleanupCoordinator = CleanupCoordinator()) {
+        self.cleanup = cleanup
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             DefaultsKey.toneFrequency: PipelineSettings().toneFrequency,
@@ -92,6 +96,8 @@ final class DecoderViewModel {
                 self?.handle(event)
             }
         }
+
+        cleanup.existingText = { [weak self] in self?.decodedText ?? "" }
 
         refreshDevices()
         deviceMonitor = AudioDeviceMonitor { [weak self] in self?.refreshDevices() }
@@ -158,7 +164,7 @@ final class DecoderViewModel {
         stopListening()
         isDecodingFile = true
         if !decodedText.isEmpty, !decodedText.hasSuffix("\n") {
-            decodedText += "\n"
+            appendText("\n")
         }
 
         let runner = self.runner
@@ -176,13 +182,15 @@ final class DecoderViewModel {
         }
     }
 
+    /// Copies the cleaned text while smart cleanup is active, otherwise the raw text.
     func copyText() {
         NSPasteboard.general.clearContents()
-        NSPasteboard.general.setString(decodedText, forType: .string)
+        NSPasteboard.general.setString(cleanup.isActive ? cleanup.text : decodedText, forType: .string)
     }
 
     func clearText() {
         decodedText = ""
+        cleanup.reset()
     }
 
     // MARK: - Pipeline events
@@ -193,6 +201,7 @@ final class DecoderViewModel {
             apply(output)
         case .finished(let output):
             apply(output)
+            cleanup.flush()
             keyDown = false
             signalLevel = 0
             pendingSymbols = ""
@@ -201,18 +210,22 @@ final class DecoderViewModel {
     }
 
     private func apply(_ output: PipelineOutput) {
-        if !output.text.isEmpty {
-            decodedText += output.text
-            if decodedText.count > Self.maxTextLength {
-                decodedText = String(decodedText.suffix(Self.maxTextLength))
-            }
-        }
+        appendText(output.text)
         keyDown = output.keyDown
         signalLevel = output.signalLevel
         snrDB = output.snrDB
         wpm = output.wpm
         pendingSymbols = output.pendingSymbols
         detectedFrequency = output.toneFrequency
+    }
+
+    private func appendText(_ text: String) {
+        guard !text.isEmpty else { return }
+        decodedText += text
+        if decodedText.count > Self.maxTextLength {
+            decodedText = String(decodedText.suffix(Self.maxTextLength))
+        }
+        cleanup.append(text)
     }
 
     private func reportFileError(_ error: any Error, url: URL) {
