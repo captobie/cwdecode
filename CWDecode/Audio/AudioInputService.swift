@@ -28,6 +28,8 @@ final class AudioInputService {
 
     private var engine: AVAudioEngine?
     private var startFormat: AVAudioFormat?
+    private var tapBlock: AVAudioNodeTapBlock?
+    private var recentResumes: [Date] = []
     private var configurationObserver: (any NSObjectProtocol)?
     private(set) var deviceID: AudioDeviceID?
 
@@ -53,7 +55,8 @@ final class AudioInputService {
         }
 
         // A nil format taps the node's own output format, whatever the device negotiated.
-        input.installTap(onBus: 0, bufferSize: 2048, format: nil, block: Self.makeTapBlock(handler: handler))
+        let tapBlock = Self.makeTapBlock(handler: handler)
+        input.installTap(onBus: 0, bufferSize: 2048, format: nil, block: tapBlock)
         engine.prepare()
         do {
             try engine.start()
@@ -71,6 +74,7 @@ final class AudioInputService {
         }
         self.engine = engine
         startFormat = format
+        self.tapBlock = tapBlock
         deviceID = device.id
     }
 
@@ -84,21 +88,39 @@ final class AudioInputService {
         engine.stop()
         self.engine = nil
         startFormat = nil
+        tapBlock = nil
+        recentResumes = []
         deviceID = nil
     }
 
     private func configurationChanged() {
-        guard let engine, let startFormat else { return }
-        // Starting on a non-default device makes macOS build an aggregate device, which posts
-        // a configuration change while the engine carries on fine. Only a stopped engine or
-        // a different format needs a restart; restarting on every notification loops forever.
+        guard let engine, let startFormat, let tapBlock else { return }
         let format = engine.inputNode.inputFormat(forBus: 0)
-        if engine.isRunning,
-           format.sampleRate == startFormat.sampleRate,
-           format.channelCount == startFormat.channelCount {
+        guard format.sampleRate == startFormat.sampleRate,
+              format.channelCount == startFormat.channelCount else {
+            onConfigurationChange?()
             return
         }
-        onConfigurationChange?()
+        // Starting on a non-default device makes macOS build an aggregate device, which posts
+        // a configuration change just after the engine starts. Sometimes the engine carries on,
+        // sometimes it stops itself. Resume this engine, whose aggregate has now settled: a
+        // fresh engine builds a new aggregate and runs into the same change again.
+        guard !engine.isRunning else { return }
+        let now = Date()
+        recentResumes = recentResumes.filter { now.timeIntervalSince($0) < 10 } + [now]
+        guard recentResumes.count <= 3 else {
+            onConfigurationChange?()
+            return
+        }
+        // The tap's format was fixed at install time; pick up whatever the node negotiated now.
+        let input = engine.inputNode
+        input.removeTap(onBus: 0)
+        input.installTap(onBus: 0, bufferSize: 2048, format: nil, block: tapBlock)
+        do {
+            try engine.start()
+        } catch {
+            onConfigurationChange?()
+        }
     }
 
     /// Built outside the main actor: the tap runs on a real-time audio thread.
