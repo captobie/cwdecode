@@ -1,8 +1,8 @@
 """The label vocabulary: one token per distinct Morse pattern.
 
 A CTC label has to be a function of the audio, so sounds that are identical get a single
-canonical token: `+` is sent exactly like AR, `=` like BT and `(` like KN, and all three are
-normalized to the prosign. Prosigns are written in angle brackets (`<SK>`); the letters
+canonical token: `+` is sent exactly like AR, `=` like BT, `(` like KN and `&` like AS, and all
+four are normalized to the prosign. Prosigns are written in angle brackets (`<SK>`); the letters
 `SK` without brackets are two characters with a letter gap between them.
 
 The token order below *is* the model's output layer. Append new tokens at the end, never
@@ -24,9 +24,10 @@ PATTERNS: dict[str, str] = {
     ".": ".-.-.-", ",": "--..--", "?": "..--..", "/": "-..-.", "-": "-....-",
     "@": ".--.-.", "'": ".----.",
     "<AR>": ".-.-.", "<BT>": "-...-", "<KN>": "-.--.", "<SK>": "...-.-",
+    "<AS>": ".-...",
 }
 
-ALIASES: dict[str, str] = {"+": "<AR>", "=": "<BT>", "(": "<KN>"}
+ALIASES: dict[str, str] = {"+": "<AR>", "=": "<BT>", "(": "<KN>", "&": "<AS>"}
 
 TOKENS: list[str] = [BLANK, SPACE, *PATTERNS]
 TOKEN_TO_ID: dict[str, int] = {token: i for i, token in enumerate(TOKENS)}

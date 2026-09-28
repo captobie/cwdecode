@@ -34,9 +34,9 @@ dataset needs no disk at all.
 
 ## Labels
 
-- **Vocabulary:** `A–Z 0–9 . , ? / - @ '`, `<AR> <BT> <KN> <SK>`, and space. CTC blank is
-  ID 0 (`cwsynth.alphabet.TOKENS`). Sounds that are identical share one token: `+ = (`
-  normalize to `<AR> <BT> <KN>`. Append new tokens only at the end.
+- **Vocabulary:** `A–Z 0–9 . , ? / - @ '`, `<AR> <BT> <KN> <SK> <AS>`, and space. CTC blank
+  is ID 0 (`cwsynth.alphabet.TOKENS`). Sounds that are identical share one token: `+ = ( &`
+  normalize to `<AR> <BT> <KN> <AS>`. Append new tokens only at the end.
 - **Consistency:** hand-sent timing is clamped so a gap inside a character, a gap between
   characters and a gap between words never overlap. A space in a label is always an audible
   word gap (`tests/test_keying.py` checks this for every fist style).
@@ -67,6 +67,37 @@ and in the app's ~170 Hz detector bandwidth (`snr_db_app`, 4.7 dB higher).
 `dataset.json` holds the vocabulary, generator version, git commit, and each split's seed,
 conditions and corpus weights.
 
+## W1AW evaluation library
+
+ARRL's W1AW code-practice recordings (5–40 WPM, 750 Hz, machine-sent; 15 WPM characters with
+Farnsworth spacing at 15 WPM and below) turned into labeled clips for **evaluation only**. ARRL
+prohibits reproducing its material without permission: the files stay in the git-ignored
+`data/w1aw/`, aren't committed or redistributed, and aren't used for training.
+
+```sh
+.venv/bin/python -m cwsynth.w1aw index                   # list archived sessions (HTML only)
+.venv/bin/python -m cwsynth.w1aw fetch --per-speed 3     # MP3 + transcript pairs, spread over the years
+.venv/bin/python -m cwsynth.w1aw build                   # → clips.jsonl, sessions.jsonl
+.venv/bin/python -m cwsynth.w1aw degrade --snr -6 0 6 12 # → degraded.jsonl (add --impair for QSB/QRN/filters)
+```
+
+- **Labels are checked two ways.** A threshold decoder (`classic.py`, exact on clean
+  machine-sent code) reads the audio, and the result is aligned to ARRL's transcript. A clip is
+  kept only if the two agree token for token, word gaps included. Clips are 3–15 s and cut at
+  word gaps.
+- **Transcript bytes** are mapped to what is actually keyed, each confirmed against the audio:
+  `=` and `0x89` → BT, `0x82` → AR, `0x83` → AS, `Ø` or `0` plus a stray `0x98` → 0. The trailing
+  `<` and `^Z` aren't keyed.
+- **`sessions.jsonl`** keeps each full recording with its whole transcript, for testing
+  windowed decoding end to end.
+- **`degraded.jsonl`** has every clip at fixed SNRs, measured against the recording's own carrier
+  level, so the SNR definition matches cwsynth's.
+
+The first build (3 sessions per speed from 2010/2013, 2018 and 2026): 2,136 clips, 6.0 h,
+97–100% of words kept at 10 WPM and up. 5 and 7.5 WPM keep 88–100%, because at those speeds a
+single long word can exceed the 15 s clip limit. Disk: about 220 MB of MP3s, 360 MB of WAVs,
+340 MB of clips and 1.3 GB of degraded copies (all regenerable).
+
 ## Modules
 
 | File | Role |
@@ -79,3 +110,5 @@ conditions and corpus weights.
 | `corpus.py` | Text sources and their mix; callsigns are split into train/val/test by hash |
 | `render.py` | `render(spec)` and `generate(seed)` |
 | `dataset.py` | Parallel batch writer and manifest |
+| `classic.py` | Threshold decoder for clean machine-sent audio, used to label recordings |
+| `w1aw.py` | W1AW index, download, alignment, clips and degraded copies |

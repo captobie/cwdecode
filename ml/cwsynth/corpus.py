@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-from cwsynth.alphabet import ALIASES, KEYED, PATTERNS
+from cwsynth.alphabet import ALIASES, KEYED, PATTERNS, normalize
 
 DEFAULT_WEIGHTS: dict[str, float] = {
     "callsign": 0.20, "qso": 0.30, "abbreviation": 0.15,
@@ -43,7 +43,7 @@ ABBREVIATIONS = [
     "CUL", "CUAGN", "GM", "GA", "GE", "GN", "GL", "DX", "TEST", "NR", "ABT", "BURO", "DR",
     "FER", "HPE", "INFO", "MNI", "OB", "RPT", "SIG", "SOLID", "VY", "WID", "WL", "WKD",
     "ENUF", "HI", "BCNU", "AA", "AB", "EU", "NA", "SA", "AF", "OC", "POTA", "SOTA",
-    "K", "KN", "BK", "R", "CL", "AS", "<AR>", "<BT>", "<KN>", "<SK>",
+    "K", "KN", "BK", "R", "CL", "AS", "<AR>", "<BT>", "<KN>", "<SK>", "<AS>",
 ]
 NAMES = ["JOHN", "BOB", "JIM", "TOM", "MIKE", "DAVE", "BILL", "STEVE", "DAN", "KEN", "ED",
          "PAUL", "JACK", "CARL", "AL", "PETE", "RAY", "DON", "JOE", "ANN", "SUE", "MARY",
@@ -170,7 +170,7 @@ def qso(rng: np.random.Generator, split: str = "train") -> str:
                            f"R R TNX {name} 73 <SK>", f"73 CUL <SK> E E", f"{you} 73 TU <SK>",
                            f"FB {name} HPE CUAGN 73 <SK>"])
     return _pick(rng, [f"SRI QRM PSE RPT UR NAME", "QRS PSE", "QSB <BT> PSE AGN",
-                       f"QSY UP 2 {me}", f"{you} QRX 5", "QRN HR <BT> PSE RPT", "BK", "R R <BT> OK"])
+                       f"QSY UP 2 {me}", f"{you} QRX 5", f"<AS> {you}", "QRN HR <BT> PSE RPT", "BK", "R R <BT> OK"])
 
 
 def abbreviations(rng: np.random.Generator, split: str = "train") -> str:
@@ -197,12 +197,12 @@ def random_characters(rng: np.random.Generator, split: str = "train") -> str:
 
 
 def clean_text(text: str) -> str:
-    """Uppercase `text` and keep only what can be sent: a few punctuation marks are mapped
-    to their CW equivalents and everything else unsupported becomes a space."""
+    """Canonical label text from arbitrary prose: a few punctuation marks are mapped to their
+    CW equivalents, aliases become prosigns, and everything unsupported becomes a space."""
     text = text.upper().replace(";", ",").replace(":", ",").replace("!", ".")
     text = text.replace('"', " ").replace("(", " ").replace(")", " ")
     allowed = {k for k in PATTERNS if len(k) == 1} | set(ALIASES)
-    return re.sub(r"\s+", " ", "".join(c if c in allowed else " " for c in text)).strip()
+    return normalize("".join(c if c in allowed else " " for c in text))
 
 
 class CorpusMix:

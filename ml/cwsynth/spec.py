@@ -95,7 +95,7 @@ class ConditionRanges:
 
     wpm: tuple[float, float] = (8.0, 40.0)                 # log-uniform
     farnsworth_prob: float = 0.10
-    farnsworth_ratio: tuple[float, float] = (0.4, 0.85)    # overall speed / character speed
+    farnsworth_ratio: tuple[float, float] = (0.3, 0.85)    # overall / character speed; W1AW 5 WPM is 0.33
     fist_styles: dict[str, float] = field(default_factory=lambda: {
         "machine": 0.15, "paddle": 0.35, "bug": 0.15, "straight": 0.35})
     rise_ms: tuple[float, float] = (2.0, 8.0)

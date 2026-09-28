@@ -6,7 +6,7 @@ sample_rate = 8000
 
 wpm = [8.0, 40.0]                    # log-uniform
 farnsworth_prob = 0.10
-farnsworth_ratio = [0.4, 0.85]       # overall speed / character speed
+farnsworth_ratio = [0.3, 0.85]       # overall / character speed; W1AW 5 WPM is 0.33
 rise_ms = [2.0, 8.0]
 max_signal_s = 15.0
 lead_s = [0.2, 1.5]
