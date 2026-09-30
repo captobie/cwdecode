@@ -6,6 +6,7 @@ xcuserdata/
 
 # ml/
 ml/.venv/
+ml/.venv-export/
 ml/data/
 __pycache__/
 *.egg-info/

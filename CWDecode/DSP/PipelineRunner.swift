@@ -1,6 +1,7 @@
 import Foundation
 
-/// Runs a `DecoderPipeline` on a private serial queue, recreating it when the sample rate changes.
+/// Runs the selected decoder on a private serial queue, recreating it when the sample rate or
+/// the decoder kind changes.
 final class PipelineRunner: @unchecked Sendable {
     enum Event: Sendable {
         case output(PipelineOutput)
@@ -10,12 +11,15 @@ final class PipelineRunner: @unchecked Sendable {
 
     // Everything below is only touched on `queue`.
     private let queue = DispatchQueue(label: "com.carlobermeier.CWDecode.pipeline", qos: .userInitiated)
-    private var pipeline: DecoderPipeline?
+    private var pipeline: (any DecoderEngine)?
     private var settings: PipelineSettings
+    private let neuralModel: CWNetModel?
     private let emit: @Sendable (Event) -> Void
 
-    init(settings: PipelineSettings, emit: @escaping @Sendable (Event) -> Void) {
+    /// Without a `neuralModel`, the classic decoder runs whatever `settings.decoder` says.
+    init(settings: PipelineSettings, neuralModel: CWNetModel?, emit: @escaping @Sendable (Event) -> Void) {
         self.settings = settings
+        self.neuralModel = neuralModel
         self.emit = emit
     }
 
@@ -31,8 +35,15 @@ final class PipelineRunner: @unchecked Sendable {
 
     func update(_ settings: PipelineSettings) {
         queue.async {
+            let switching = settings.decoder != self.settings.decoder
             self.settings = settings
-            self.pipeline?.update(settings)
+            if switching, let pipeline = self.pipeline {
+                // Flush what the old decoder still holds; the next audio starts the new one.
+                self.emit(.output(pipeline.finish()))
+                self.pipeline = nil
+            } else {
+                self.pipeline?.update(settings)
+            }
         }
     }
 
@@ -49,7 +60,11 @@ final class PipelineRunner: @unchecked Sendable {
 
     private func process(_ samples: [Float], sampleRate: Double) {
         if pipeline?.sampleRate != sampleRate {
-            pipeline = DecoderPipeline(sampleRate: sampleRate, settings: settings)
+            if settings.decoder == .neural, let neuralModel {
+                pipeline = NeuralPipeline(sampleRate: sampleRate, settings: settings, model: neuralModel)
+            } else {
+                pipeline = DecoderPipeline(sampleRate: sampleRate, settings: settings)
+            }
         }
         guard let pipeline else { return }
         emit(.output(pipeline.process(samples)))

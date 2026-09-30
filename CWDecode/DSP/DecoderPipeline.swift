@@ -1,14 +1,30 @@
 import Foundation
 
+enum DecoderKind: String, CaseIterable, Sendable {
+    /// The CNN + CTC model trained on synthetic CW (`ml/`).
+    case neural
+    /// Tone detection, threshold and timing rules.
+    case classic
+
+    var title: String {
+        switch self {
+        case .neural: "Neural"
+        case .classic: "Classic"
+        }
+    }
+}
+
 struct PipelineSettings: Sendable, Equatable {
     var toneFrequency = 700.0
     var autoTune = true
-    /// Minimum signal-to-noise ratio before the key is allowed to close.
+    /// Minimum signal-to-noise ratio before the key is allowed to close (classic decoder only).
     var squelchDB = 12.0
     var initialWPM = 20.0
+    var decoder = DecoderKind.classic
 }
 
 struct PipelineOutput: Sendable {
+    /// Newly committed text.
     var text = ""
     var keyDown = false
     /// Current tone level between the noise floor (0) and the signal peak (1).
@@ -16,13 +32,26 @@ struct PipelineOutput: Sendable {
     var snrDB = 0.0
     var toneFrequency = 0.0
     var wpm = 0.0
+    /// Classic decoder: dits and dahs of the character being received.
     var pendingSymbols = ""
+    /// Neural decoder: text past the last commit point, replaced on every update.
+    var tentativeText = ""
+}
+
+/// A decoder that turns audio chunks into text. Not thread-safe; confine each instance to one
+/// thread or serial queue.
+protocol DecoderEngine: AnyObject {
+    var sampleRate: Double { get }
+    func update(_ settings: PipelineSettings)
+    func process(_ samples: [Float]) -> PipelineOutput
+    /// Flushes whatever is still in progress, e.g. at the end of a file or when listening stops.
+    func finish() -> PipelineOutput
 }
 
 /// Audio in, text out: tone detection → adaptive keying threshold → Morse timing decoder.
 ///
 /// Not thread-safe; confine each instance to one thread or serial queue.
-final class DecoderPipeline {
+final class DecoderPipeline: DecoderEngine {
     let sampleRate: Double
     private(set) var settings: PipelineSettings
 

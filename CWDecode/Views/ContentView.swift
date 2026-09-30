@@ -10,7 +10,7 @@ struct ContentView: View {
         VStack(spacing: 0) {
             SignalStatusBar()
             Divider()
-            DecodedTextView(text: model.decodedText)
+            DecodedTextView(text: model.decodedText, tentative: model.tentativeText)
             Divider()
             TuningControls()
         }
@@ -18,6 +18,9 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem {
                 InputDevicePicker()
+            }
+            ToolbarItem {
+                DecoderPicker()
             }
             ToolbarItemGroup {
                 Button {
@@ -107,17 +110,37 @@ private struct InputDevicePicker: View {
     }
 }
 
+private struct DecoderPicker: View {
+    @Environment(DecoderViewModel.self) private var model
+
+    var body: some View {
+        @Bindable var model = model
+
+        Picker("Decoder", selection: $model.decoder) {
+            ForEach(DecoderKind.allCases, id: \.self) { kind in
+                Text(kind.title).tag(kind)
+            }
+        }
+        .pickerStyle(.segmented)
+        .disabled(model.neuralUnavailableReason != nil)
+        .help(model.neuralUnavailableReason
+              ?? "Neural: a model trained on simulated CW, best on weak and noisy signals. Classic: tone threshold and timing rules.")
+    }
+}
+
 private struct DecodedTextView: View {
     let text: String
+    /// Newest text, not yet final: shown dimmed after the committed text.
+    let tentative: String
 
     var body: some View {
         ScrollView {
             Group {
-                if text.isEmpty {
+                if text.isEmpty && tentative.isEmpty {
                     Text("Click Listen to decode your audio input, or open a recording.")
                         .foregroundStyle(.secondary)
                 } else {
-                    Text(text)
+                    Text("\(text)\(Text(tentative).foregroundStyle(.tertiary))")
                         .textSelection(.enabled)
                 }
             }
@@ -215,7 +238,10 @@ private struct TuningControls: View {
                     .monospacedDigit()
                     .frame(width: 44, alignment: .trailing)
             }
-            .help("Minimum signal-to-noise ratio needed before anything is decoded")
+            .disabled(model.decoder == .neural)
+            .help(model.decoder == .neural
+                  ? "The neural decoder doesn't need a squelch: it stays silent on noise"
+                  : "Minimum signal-to-noise ratio needed before anything is decoded")
         }
         .padding(.horizontal)
         .padding(.vertical, 12)

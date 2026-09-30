@@ -1,9 +1,10 @@
-# cwsynth: synthetic CW training data
+# ml: CWDecode's neural decoder
 
-The first piece of CWDecode's neural decoder: synthetic Morse audio paired with its exact text,
-for training a spectrogram → CNN → CTC model. The approach follows
-[DeepFist](https://github.com/n9bc/DeepFist). The code is written from scratch (DeepFist is
-GPL-3.0), and the ham vocabulary is ported from HamLexicon on the abandoned `smart-cleanup` branch.
+Everything behind CWDecode's neural decoder: `cwsynth` makes synthetic Morse audio paired with
+its exact text, and `cwmodel` trains, evaluates and exports a spectrogram → CNN → CTC model.
+The approach follows [DeepFist](https://github.com/n9bc/DeepFist). The code is written from
+scratch (DeepFist is GPL-3.0), and the ham vocabulary is ported from HamLexicon on the abandoned
+`smart-cleanup` branch.
 
 ## Setup
 
@@ -98,6 +99,41 @@ The first build (3 sessions per speed from 2010/2013, 2018 and 2026): 2,136 clip
 single long word can exceed the 15 s clip limit. Disk: about 220 MB of MP3s, 360 MB of WAVs,
 340 MB of clips and 1.3 GB of degraded copies (all regenerable).
 
+## The model (`cwmodel`)
+
+Spectrogram → CNN → CTC, trained on cwsynth samples generated on the fly
+(`python -m cwmodel.train`; stages `clean` then `full`). `python -m cwmodel.evaluate` reports
+error rates by SNR, speed, fist and source; `python -m cwmodel.stream` decodes whole W1AW
+sessions the way the app does.
+
+Exporting for the app needs coremltools, whose native parts aren't built for Python 3.14, so it
+runs in a separate environment pinned to the torch version coremltools is tested against:
+
+```sh
+/opt/homebrew/bin/python3.13 -m venv .venv-export
+.venv-export/bin/pip install "torch==2.7.0" coremltools numpy scipy
+.venv-export/bin/pip install -e . --no-deps
+.venv-export/bin/python -m cwmodel.export --ckpt runs/full/best.pt
+```
+
+That writes `CWDecode/Model/CWNet.mlpackage` (vocabulary and feature settings in its metadata;
+the app refuses a model that doesn't match its front end) and the golden files in
+`CWDecodeTests/Resources/Neural/`. Commit a new model only when it should ship.
+
+First model (30k steps full stage after 6k clean; 528k parameters):
+
+| Test | CER |
+| --- | --- |
+| W1AW clips, clean | 0.54% |
+| W1AW whole sessions, streamed like the app | 1.19% (0–1% at 13 WPM and up) |
+| W1AW sessions at +3 dB | 3.35% |
+| W1AW clips with white noise at +12 / +6 / 0 / −6 dB | 0.8% / 1.2% / 14% / 98% |
+| Noise-only synthetic samples | 0.00 invented characters per sample |
+
+Known weak spots: hand-sent code (straight key and bug 2.5–3× the machine error rate at good
+SNR), SNR below 0 dB, deep fading, and missing word spaces in extreme Farnsworth spacing
+(W1AW 5 WPM: 17% session CER, almost all missing spaces).
+
 ## Modules
 
 | File | Role |
@@ -112,3 +148,9 @@ single long word can exceed the 15 s clip limit. Disk: about 220 MB of MP3s, 360
 | `dataset.py` | Parallel batch writer and manifest |
 | `classic.py` | Threshold decoder for clean machine-sent audio, used to label recordings |
 | `w1aw.py` | W1AW index, download, alignment, clips and degraded copies |
+| `cwmodel/features.py` | Spectrogram (the Swift `NeuralFeatures` matches it) |
+| `cwmodel/net.py` | The network |
+| `cwmodel/data.py` | On-the-fly synthetic batches (length-bucketed), manifest readers |
+| `cwmodel/train.py`, `evaluate.py` | Training stages and error-rate breakdowns |
+| `cwmodel/stream.py` | Windowed streaming decoding (the Swift `StreamingCTCDecoder` matches it) |
+| `cwmodel/export.py` | Core ML export and golden test files |

@@ -6,6 +6,8 @@ import Observation
 final class DecoderViewModel {
     private(set) var decodedText = ""
     private(set) var pendingSymbols = ""
+    /// Neural decoder: the newest text, not yet committed; replaced on every update.
+    private(set) var tentativeText = ""
     private(set) var isListening = false
     private(set) var isDecodingFile = false
     private(set) var keyDown = false
@@ -26,6 +28,10 @@ final class DecoderViewModel {
         }
     }
     var squelchDB: Double { didSet { settingsChanged() } }
+    var decoder: DecoderKind { didSet { settingsChanged() } }
+
+    /// Why the neural decoder can't be used, or nil when it can.
+    let neuralUnavailableReason: String?
 
     private(set) var inputDevices: [AudioInputDevice] = []
     private(set) var defaultInputDevice: AudioInputDevice?
@@ -60,32 +66,46 @@ final class DecoderViewModel {
         static let toneFrequency = "toneFrequency"
         static let autoTune = "autoTune"
         static let squelchDB = "squelchDB"
+        static let decoder = "decoder"
         static let inputDeviceUID = "inputDeviceUID"
         static let inputDeviceName = "inputDeviceName"
     }
 
     init() {
+        let neuralModel: CWNetModel?
+        do {
+            neuralModel = try CWNetModel()
+            neuralUnavailableReason = nil
+        } catch {
+            neuralModel = nil
+            neuralUnavailableReason = error.localizedDescription
+        }
+
         let defaults = UserDefaults.standard
         defaults.register(defaults: [
             DefaultsKey.toneFrequency: PipelineSettings().toneFrequency,
             DefaultsKey.autoTune: PipelineSettings().autoTune,
             DefaultsKey.squelchDB: PipelineSettings().squelchDB,
+            DefaultsKey.decoder: DecoderKind.neural.rawValue,
         ])
+        let preferred = DecoderKind(rawValue: defaults.string(forKey: DefaultsKey.decoder) ?? "") ?? .neural
         let initial = PipelineSettings(
             toneFrequency: defaults.double(forKey: DefaultsKey.toneFrequency),
             autoTune: defaults.bool(forKey: DefaultsKey.autoTune),
-            squelchDB: defaults.double(forKey: DefaultsKey.squelchDB)
+            squelchDB: defaults.double(forKey: DefaultsKey.squelchDB),
+            decoder: neuralModel == nil ? .classic : preferred
         )
         toneFrequency = initial.toneFrequency
         autoTune = initial.autoTune
         squelchDB = initial.squelchDB
+        decoder = initial.decoder
         detectedFrequency = initial.toneFrequency
         selectedInputUID = defaults.string(forKey: DefaultsKey.inputDeviceUID)
         selectedInputName = defaults.string(forKey: DefaultsKey.inputDeviceName)
 
         // The stream preserves the order of pipeline output, which matters for the text.
         let (events, continuation) = AsyncStream.makeStream(of: PipelineRunner.Event.self)
-        runner = PipelineRunner(settings: initial) { continuation.yield($0) }
+        runner = PipelineRunner(settings: initial, neuralModel: neuralModel) { continuation.yield($0) }
 
         Task { [weak self] in
             for await event in events {
@@ -101,7 +121,7 @@ final class DecoderViewModel {
     }
 
     private var settings: PipelineSettings {
-        PipelineSettings(toneFrequency: toneFrequency, autoTune: autoTune, squelchDB: squelchDB)
+        PipelineSettings(toneFrequency: toneFrequency, autoTune: autoTune, squelchDB: squelchDB, decoder: decoder)
     }
 
     // MARK: - Actions
@@ -183,6 +203,7 @@ final class DecoderViewModel {
 
     func clearText() {
         decodedText = ""
+        tentativeText = ""
     }
 
     // MARK: - Pipeline events
@@ -196,6 +217,7 @@ final class DecoderViewModel {
             keyDown = false
             signalLevel = 0
             pendingSymbols = ""
+            tentativeText = ""
             isDecodingFile = false
         }
     }
@@ -212,6 +234,7 @@ final class DecoderViewModel {
         snrDB = output.snrDB
         wpm = output.wpm
         pendingSymbols = output.pendingSymbols
+        tentativeText = output.tentativeText
         detectedFrequency = output.toneFrequency
     }
 
@@ -250,6 +273,7 @@ final class DecoderViewModel {
         defaults.set(toneFrequency, forKey: DefaultsKey.toneFrequency)
         defaults.set(autoTune, forKey: DefaultsKey.autoTune)
         defaults.set(squelchDB, forKey: DefaultsKey.squelchDB)
+        defaults.set(decoder.rawValue, forKey: DefaultsKey.decoder)
         if !autoTune { detectedFrequency = toneFrequency }
         runner.update(settings)
     }
