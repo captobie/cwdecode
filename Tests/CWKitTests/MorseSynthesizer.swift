@@ -1,5 +1,5 @@
 import Foundation
-@testable import CWDecode
+@testable import CWKit
 
 /// Deterministic random numbers so noisy test signals are reproducible.
 struct SplitMix64: RandomNumberGenerator {

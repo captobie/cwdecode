@@ -7,12 +7,16 @@ against), because coremltools' native parts aren't built for newer Pythons:
     .venv-export/bin/pip install "torch==2.7.0" coremltools numpy scipy && .venv-export/bin/pip install -e . --no-deps
     .venv-export/bin/python -m cwmodel.export --ckpt runs/full/best.pt
 
-Writes CWDecode/Model/CWNet.mlpackage and CWDecodeTests/Resources/Neural/. The golden files are
-synthetic (never W1AW audio) and pin the Swift front end, model and streaming decoder to this
+Writes Sources/CWKit/Resources/CWNet.mlmodelc (compiled with Xcode's coremlcompiler, since
+SwiftPM can't compile an .mlpackage resource) and Tests/CWKitTests/Resources/Neural/. The golden
+files are synthetic (never W1AW audio) and pin the Swift front end, model and streaming decoder to this
 Python reference.
 """
 import argparse
 import json
+import shutil
+import subprocess
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -28,8 +32,8 @@ from cwsynth.render import render
 from cwsynth.spec import QsbParams, SampleSpec, sample_fist
 
 REPO = Path(__file__).resolve().parents[2]
-MODEL_PATH = REPO / "CWDecode" / "Model" / "CWNet.mlpackage"
-GOLDEN_DIR = REPO / "CWDecodeTests" / "Resources" / "Neural"
+MODEL_PATH = REPO / "Sources" / "CWKit" / "Resources" / "CWNet.mlmodelc"
+GOLDEN_DIR = REPO / "Tests" / "CWKitTests" / "Resources" / "Neural"
 STREAM = {"window_s": 6.0, "hop_s": 1.0, "context_s": 2.5, "chunk_s": 0.1}
 PCM_SCALE = 32768.0
 
@@ -75,6 +79,17 @@ def convert(model: torch.nn.Module, checkpoint: dict, source: str):
         "synthetic_val_cer": f"{metrics['val']['cer']:.4f}" if "val" in metrics else "",
     })
     return mlmodel
+
+
+def save_compiled(mlmodel) -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        package = Path(tmp) / "CWNet.mlpackage"
+        mlmodel.save(str(package))
+        subprocess.run(["xcrun", "coremlcompiler", "compile", str(package), tmp],
+                       check=True, stdout=subprocess.DEVNULL)
+        shutil.rmtree(MODEL_PATH, ignore_errors=True)
+        MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(Path(tmp) / "CWNet.mlmodelc", MODEL_PATH)
 
 
 def quantize(audio: np.ndarray) -> np.ndarray:
@@ -132,8 +147,7 @@ def main() -> None:
     model = load_model(args.ckpt, "cpu").eval()
     if not args.golden_only:
         mlmodel = convert(model, checkpoint, str(args.ckpt))
-        MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-        mlmodel.save(str(MODEL_PATH))
+        save_compiled(mlmodel)
         print(f"wrote {MODEL_PATH.relative_to(REPO)}")
     write_golden(model)
     print(f"wrote {GOLDEN_DIR.relative_to(REPO)}/")

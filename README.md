@@ -25,9 +25,13 @@ open CWDecode.xcodeproj
 
 Run `xcodegen generate` again after adding or removing files. To sign with your own team, set `DEVELOPMENT_TEAM` in `project.yml` (it currently signs to run locally).
 
-Tests: `xcodebuild -project CWDecode.xcodeproj -scheme CWDecode test`
+Tests: `swift test` for the decoders (`CWKit`), `xcodebuild -project CWDecode.xcodeproj -scheme CWDecode test` for the app.
 
-The neural decoder's model (`CWDecode/Model/CWNet.mlpackage`) is committed, so building needs no Python. It's trained and exported from `ml/` (see [`ml/README.md`](ml/README.md)); the export also rewrites the golden files in `CWDecodeTests/Resources/Neural/` that hold the Swift front end, model and streaming decoder to the Python reference.
+The neural decoder's model (`Sources/CWKit/Resources/CWNet.mlmodelc`, compiled, since SwiftPM can't compile an `.mlpackage` resource) is committed, so building needs no Python. It's trained and exported from `ml/` (see [`ml/README.md`](ml/README.md)); the export also rewrites the golden files in `Tests/CWKitTests/Resources/Neural/` that hold the Swift front end, model and streaming decoder to the Python reference.
+
+## CWKit
+
+The decoders live in a Swift package, `CWKit` (`Package.swift` at the repo root), with no app or audio-device code, so other apps can feed it their own audio. The CWDecode app is its first client; [FTX1Remote](https://github.com/captobie/ftx1-remote) uses it for its CW window. Its API is `PipelineRunner` (submit `[Float]` chunks at any sample rate from any thread; text and meters come back as `PipelineOutput` events), `PipelineSettings`, `DecoderKind`, `CWNetModel` and `AudioFileReader`. Apps depend on a tagged version, so tag a release when a decoder change or a new model should reach them.
 
 ## How it works
 
@@ -50,15 +54,20 @@ audio ─▶ ToneDetector ─▶ adaptive threshold ─▶ MorseDecoder ─▶ t
 
 | Path | Role |
 | --- | --- |
-| `CWDecode/Neural/NeuralPipeline.swift` | Neural decoder: resampling, windowed decoding, meters from the classic detector |
-| `CWDecode/Neural/NeuralFeatures.swift` | Spectrogram, identical to `ml/cwmodel/features.py` |
-| `CWDecode/Neural/CWNetModel.swift` | Loads the Core ML model, checks it matches the front end, runs a window |
-| `CWDecode/Neural/StreamingCTCDecoder.swift` | Overlapping windows → committed and tentative text; port of `ml/cwmodel/stream.py` |
-| `CWDecode/Neural/AudioResampler.swift` | Any input rate → 8 kHz |
-| `CWDecode/DSP/DecoderPipeline.swift` | Classic decoder: audio → key up/down → text; noise floor, squelch, debounce. Also defines the `DecoderEngine` protocol |
-| `CWDecode/DSP/ToneDetector.swift` | Tone power over 12 ms windows every 4 ms |
-| `CWDecode/DSP/FrequencyTracker.swift` | Finds the CW tone for auto-tune |
-| `CWDecode/Morse/MorseDecoder.swift` | Timing → characters, adaptive speed |
-| `CWDecode/DSP/PipelineRunner.swift` | Runs the selected decoder off the main thread |
-| `CWDecode/Audio/` | Input device list, audio input, and audio file reading |
+| `Sources/CWKit/Neural/NeuralPipeline.swift` | Neural decoder: resampling, windowed decoding, meters from the classic detector |
+| `Sources/CWKit/Neural/NeuralFeatures.swift` | Spectrogram, identical to `ml/cwmodel/features.py` |
+| `Sources/CWKit/Neural/CWNetModel.swift` | Loads the Core ML model, checks it matches the front end, runs a window |
+| `Sources/CWKit/Neural/StreamingCTCDecoder.swift` | Overlapping windows → committed and tentative text; port of `ml/cwmodel/stream.py` |
+| `Sources/CWKit/Neural/AudioResampler.swift` | Any input rate → 8 kHz |
+| `Sources/CWKit/DSP/DecoderPipeline.swift` | Classic decoder: audio → key up/down → text; noise floor, squelch, debounce. Also defines the `DecoderEngine` protocol |
+| `Sources/CWKit/DSP/ToneDetector.swift` | Tone power over 12 ms windows every 4 ms |
+| `Sources/CWKit/DSP/FrequencyTracker.swift` | Finds the CW tone for auto-tune |
+| `Sources/CWKit/Morse/MorseDecoder.swift` | Timing → characters, adaptive speed |
+| `Sources/CWKit/DSP/PipelineRunner.swift` | Runs the selected decoder off the main thread |
+| `Sources/CWKit/Audio/AudioFileReader.swift` | Audio file reading |
+| `CWDecode/Audio/` | Input device list and audio input (app only) |
 | `CWDecode/App/DecoderViewModel.swift` | UI state and actions |
+
+## License
+
+MIT; see [`LICENSE`](LICENSE).

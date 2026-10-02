@@ -9,35 +9,12 @@
 /* Begin PBXBuildFile section */
 		06B2EF864CC1F7004B59B013 /* DecoderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07CBF7D928389CE6AF26B2 /* DecoderViewModel.swift */; };
 		0B2D2FB7D04C214BB1620B73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A18A68FB1E3C86C20FC258B /* ContentView.swift */; };
-		0B869929B84CA8C65FC5A8BE /* NeuralDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7669FF4BAFDCB1F401FC65A9 /* NeuralDecoderTests.swift */; };
-		1791DF3349857EDE68A619F3 /* AudioFileReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2168541AE7BFDC2549F8B227 /* AudioFileReaderTests.swift */; };
 		2292580E4AD992F6E636F5EF /* AudioInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1CFA836A3BF6CFAE4592E /* AudioInputService.swift */; };
 		2836FB6F446A207D942703A0 /* AudioDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C3C1508E00AF9F9A0DB98C /* AudioDevices.swift */; };
-		2B7DF3128266AF9656F2F2E7 /* CWNet.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = 85FBA9646157AC762C4A8DA8 /* CWNet.mlpackage */; };
-		30F075AD0014E596FAE02397 /* DecoderPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29BA33088DA793EF3F078D6 /* DecoderPipeline.swift */; };
-		3B1A02758EDE3B40641B3BCA /* NeuralFeatures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102EA85572C29A359D29C1DC /* NeuralFeatures.swift */; };
 		493BA90D36D438E0FC2A654D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5FD60A04E627C2179F56D7B /* Assets.xcassets */; };
-		4BA206D9C8950B5E7E9BB8C2 /* CWNetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D023ED918176C3616E20FFE9 /* CWNetModel.swift */; };
-		4BF8346A3A8B9C0E39BF865A /* StreamingCTCDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18703928DD2F0B44F2A9812E /* StreamingCTCDecoder.swift */; };
-		555BE45F29FC10665FF2167D /* stream_fast.s16 in Resources */ = {isa = PBXBuildFile; fileRef = 712C973B28F2ABDCD556F098 /* stream_fast.s16 */; };
-		6088458ACD521EB94B07506D /* MorseDecoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB5212C50F96042FDB66D55 /* MorseDecoder.swift */; };
-		68247B0AF36EE0D9D8060010 /* DecoderPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D1BD89265A7B45F6A8CA70 /* DecoderPipelineTests.swift */; };
-		69A1BFAC0DDF9D946A8D04A9 /* golden.json in Resources */ = {isa = PBXBuildFile; fileRef = 0E323D3B14345DC4525629CF /* golden.json */; };
-		6DC46420FF91B5ED74366CDA /* MorseDecoderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7A251A9837F93DDBDABC9E /* MorseDecoderTests.swift */; };
-		809DD5379ED24F8DABA356AA /* FrequencyTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87F3ABF030A789807061D43 /* FrequencyTracker.swift */; };
-		828481677A484B7F46CA1528 /* MorseCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CC8F7611C73BD42602D9E9A /* MorseCode.swift */; };
-		8B4C1A031FAC43CBF4F3BC40 /* features.s16 in Resources */ = {isa = PBXBuildFile; fileRef = DD48D1CB5D2739B1DD23098F /* features.s16 */; };
-		8E1746828484E9B1919CC1D9 /* Goertzel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40DB503A6CE9ADD8D08C022B /* Goertzel.swift */; };
-		8F6ABD452A288D4E53F97F87 /* PipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7607448C3E1BBF59E4BCAB /* PipelineRunner.swift */; };
-		9B4F17881A7C5D2D1A3D887A /* NeuralPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = F736E4F30F749C6E4BFB0468 /* NeuralPipeline.swift */; };
-		A8166F273699BB01139BAA66 /* stream_noise.s16 in Resources */ = {isa = PBXBuildFile; fileRef = C594AA95655FDA4558143664 /* stream_noise.s16 */; };
-		DFB6C62A938E555393B049EB /* ToneDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16951A3587C1FF3FD181D30A /* ToneDetector.swift */; };
-		E2BE99848C62B37713D2A911 /* stream_hand.s16 in Resources */ = {isa = PBXBuildFile; fileRef = C0CAD75A1A64D2828E74452C /* stream_hand.s16 */; };
+		A637C20634B54398018A32FC /* CWKit in Frameworks */ = {isa = PBXBuildFile; productRef = BD78D8829E14BED7BFE3968B /* CWKit */; };
 		E82D4D56D063C7A7DE870C8E /* AudioDevicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA5C3CBDF193020BA619965 /* AudioDevicesTests.swift */; };
-		F169FA7D4A3DE844A240B5AE /* AudioFileReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73201E4B071DC85625DBA48F /* AudioFileReader.swift */; };
 		F8644A9C5FD84CD34C6A8A44 /* CWDecodeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A3C7E1FD6BE0C3BF33722F /* CWDecodeApp.swift */; };
-		FAFCDE153FF4F7DD7606B95B /* AudioResampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B67941F9A4077E41373EF4E /* AudioResampler.swift */; };
-		FBC02155AADBE121BCD33352 /* MorseSynthesizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A89BA25D9158637BCBB0011 /* MorseSynthesizer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,66 +28,36 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0E323D3B14345DC4525629CF /* golden.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = golden.json; sourceTree = "<group>"; };
-		102EA85572C29A359D29C1DC /* NeuralFeatures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeuralFeatures.swift; sourceTree = "<group>"; };
+		12611F50C5E4123E67FD43A6 /* cwdecode */ = {isa = PBXFileReference; lastKnownFileType = folder; name = cwdecode; path = .; sourceTree = SOURCE_ROOT; };
 		12E2172BC38A84C2E06B0534 /* CWDecodeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CWDecodeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		15C3C1508E00AF9F9A0DB98C /* AudioDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevices.swift; sourceTree = "<group>"; };
-		16951A3587C1FF3FD181D30A /* ToneDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToneDetector.swift; sourceTree = "<group>"; };
-		18703928DD2F0B44F2A9812E /* StreamingCTCDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingCTCDecoder.swift; sourceTree = "<group>"; };
 		1C20DDB1A4A22A594394DDCF /* CWDecode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CWDecode.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2168541AE7BFDC2549F8B227 /* AudioFileReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileReaderTests.swift; sourceTree = "<group>"; };
 		24B1CFA836A3BF6CFAE4592E /* AudioInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioInputService.swift; sourceTree = "<group>"; };
-		2CB5212C50F96042FDB66D55 /* MorseDecoder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorseDecoder.swift; sourceTree = "<group>"; };
-		2F7A251A9837F93DDBDABC9E /* MorseDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorseDecoderTests.swift; sourceTree = "<group>"; };
-		40DB503A6CE9ADD8D08C022B /* Goertzel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goertzel.swift; sourceTree = "<group>"; };
-		4A89BA25D9158637BCBB0011 /* MorseSynthesizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorseSynthesizer.swift; sourceTree = "<group>"; };
 		4D07CBF7D928389CE6AF26B2 /* DecoderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoderViewModel.swift; sourceTree = "<group>"; };
-		55D1BD89265A7B45F6A8CA70 /* DecoderPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoderPipelineTests.swift; sourceTree = "<group>"; };
 		580FCD89870C431B52BBFD87 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5A18A68FB1E3C86C20FC258B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		712C973B28F2ABDCD556F098 /* stream_fast.s16 */ = {isa = PBXFileReference; path = stream_fast.s16; sourceTree = "<group>"; };
-		73201E4B071DC85625DBA48F /* AudioFileReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioFileReader.swift; sourceTree = "<group>"; };
-		7669FF4BAFDCB1F401FC65A9 /* NeuralDecoderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeuralDecoderTests.swift; sourceTree = "<group>"; };
-		7B67941F9A4077E41373EF4E /* AudioResampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioResampler.swift; sourceTree = "<group>"; };
-		7CC8F7611C73BD42602D9E9A /* MorseCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorseCode.swift; sourceTree = "<group>"; };
-		85FBA9646157AC762C4A8DA8 /* CWNet.mlpackage */ = {isa = PBXFileReference; path = CWNet.mlpackage; sourceTree = "<group>"; };
 		AAA5C3CBDF193020BA619965 /* AudioDevicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevicesTests.swift; sourceTree = "<group>"; };
-		C0CAD75A1A64D2828E74452C /* stream_hand.s16 */ = {isa = PBXFileReference; path = stream_hand.s16; sourceTree = "<group>"; };
-		C594AA95655FDA4558143664 /* stream_noise.s16 */ = {isa = PBXFileReference; path = stream_noise.s16; sourceTree = "<group>"; };
-		C87F3ABF030A789807061D43 /* FrequencyTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrequencyTracker.swift; sourceTree = "<group>"; };
-		D023ED918176C3616E20FFE9 /* CWNetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWNetModel.swift; sourceTree = "<group>"; };
 		DB0B29D3CFD34850ABD5AA11 /* CWDecode.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CWDecode.entitlements; sourceTree = "<group>"; };
-		DD48D1CB5D2739B1DD23098F /* features.s16 */ = {isa = PBXFileReference; path = features.s16; sourceTree = "<group>"; };
 		E5FD60A04E627C2179F56D7B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E9A3C7E1FD6BE0C3BF33722F /* CWDecodeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWDecodeApp.swift; sourceTree = "<group>"; };
-		F29BA33088DA793EF3F078D6 /* DecoderPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoderPipeline.swift; sourceTree = "<group>"; };
-		F736E4F30F749C6E4BFB0468 /* NeuralPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeuralPipeline.swift; sourceTree = "<group>"; };
-		FD7607448C3E1BBF59E4BCAB /* PipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineRunner.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFrameworksBuildPhase section */
+		CCD34B7B0843BED1D29FC1F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A637C20634B54398018A32FC /* CWKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
-		0BCB0D467D14A1E1C2065DDB /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				85FBA9646157AC762C4A8DA8 /* CWNet.mlpackage */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		0D745E07F0B85C7D6226DF83 /* Morse */ = {
-			isa = PBXGroup;
-			children = (
-				7CC8F7611C73BD42602D9E9A /* MorseCode.swift */,
-				2CB5212C50F96042FDB66D55 /* MorseDecoder.swift */,
-			);
-			path = Morse;
-			sourceTree = "<group>";
-		};
 		215253F1647D8C7547534E11 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
 				15C3C1508E00AF9F9A0DB98C /* AudioDevices.swift */,
-				73201E4B071DC85625DBA48F /* AudioFileReader.swift */,
 				24B1CFA836A3BF6CFAE4592E /* AudioInputService.swift */,
 			);
 			path = Audio;
@@ -128,12 +75,6 @@
 			isa = PBXGroup;
 			children = (
 				AAA5C3CBDF193020BA619965 /* AudioDevicesTests.swift */,
-				2168541AE7BFDC2549F8B227 /* AudioFileReaderTests.swift */,
-				55D1BD89265A7B45F6A8CA70 /* DecoderPipelineTests.swift */,
-				2F7A251A9837F93DDBDABC9E /* MorseDecoderTests.swift */,
-				4A89BA25D9158637BCBB0011 /* MorseSynthesizer.swift */,
-				7669FF4BAFDCB1F401FC65A9 /* NeuralDecoderTests.swift */,
-				DB79465AE100BC1EE1BC92A5 /* Resources */,
 			);
 			path = CWDecodeTests;
 			sourceTree = "<group>";
@@ -156,36 +97,12 @@
 			path = App;
 			sourceTree = "<group>";
 		};
-		ACD9C0085AA5B78590C6EBF9 /* Neural */ = {
+		B5C1A5C6D35A726028F136FB /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				7B67941F9A4077E41373EF4E /* AudioResampler.swift */,
-				D023ED918176C3616E20FFE9 /* CWNetModel.swift */,
-				102EA85572C29A359D29C1DC /* NeuralFeatures.swift */,
-				F736E4F30F749C6E4BFB0468 /* NeuralPipeline.swift */,
-				18703928DD2F0B44F2A9812E /* StreamingCTCDecoder.swift */,
+				12611F50C5E4123E67FD43A6 /* cwdecode */,
 			);
-			path = Neural;
-			sourceTree = "<group>";
-		};
-		DB7904289732D31535D89BCE /* DSP */ = {
-			isa = PBXGroup;
-			children = (
-				F29BA33088DA793EF3F078D6 /* DecoderPipeline.swift */,
-				C87F3ABF030A789807061D43 /* FrequencyTracker.swift */,
-				40DB503A6CE9ADD8D08C022B /* Goertzel.swift */,
-				FD7607448C3E1BBF59E4BCAB /* PipelineRunner.swift */,
-				16951A3587C1FF3FD181D30A /* ToneDetector.swift */,
-			);
-			path = DSP;
-			sourceTree = "<group>";
-		};
-		DB79465AE100BC1EE1BC92A5 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				F1AAFE416036F56AAB76C7A7 /* Neural */,
-			);
-			path = Resources;
+			name = Packages;
 			sourceTree = "<group>";
 		};
 		E3579F306576A42733A74DE5 /* CWDecode */ = {
@@ -196,25 +113,9 @@
 				580FCD89870C431B52BBFD87 /* Info.plist */,
 				A989B70BB671812E48AC7587 /* App */,
 				215253F1647D8C7547534E11 /* Audio */,
-				DB7904289732D31535D89BCE /* DSP */,
-				0BCB0D467D14A1E1C2065DDB /* Model */,
-				0D745E07F0B85C7D6226DF83 /* Morse */,
-				ACD9C0085AA5B78590C6EBF9 /* Neural */,
 				302E6E6E01A7B49C7ECAB6CC /* Views */,
 			);
 			path = CWDecode;
-			sourceTree = "<group>";
-		};
-		F1AAFE416036F56AAB76C7A7 /* Neural */ = {
-			isa = PBXGroup;
-			children = (
-				DD48D1CB5D2739B1DD23098F /* features.s16 */,
-				0E323D3B14345DC4525629CF /* golden.json */,
-				712C973B28F2ABDCD556F098 /* stream_fast.s16 */,
-				C0CAD75A1A64D2828E74452C /* stream_hand.s16 */,
-				C594AA95655FDA4558143664 /* stream_noise.s16 */,
-			);
-			path = Neural;
 			sourceTree = "<group>";
 		};
 		FB7BE20B30C900CA05D6E644 = {
@@ -222,6 +123,7 @@
 			children = (
 				E3579F306576A42733A74DE5 /* CWDecode */,
 				309B09D40DEBAC1EAA32F105 /* CWDecodeTests */,
+				B5C1A5C6D35A726028F136FB /* Packages */,
 				5D783A843E43305E7C0A88CE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -235,6 +137,7 @@
 			buildPhases = (
 				D4BE507A4DA11E22B6567FF6 /* Sources */,
 				561DD588C6ACBDFC5C8F9F98 /* Resources */,
+				CCD34B7B0843BED1D29FC1F2 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -242,6 +145,7 @@
 			);
 			name = CWDecode;
 			packageProductDependencies = (
+				BD78D8829E14BED7BFE3968B /* CWKit */,
 			);
 			productName = CWDecode;
 			productReference = 1C20DDB1A4A22A594394DDCF /* CWDecode.app */;
@@ -252,7 +156,6 @@
 			buildConfigurationList = 14600929C14838C3A1C96E6F /* Build configuration list for PBXNativeTarget "CWDecodeTests" */;
 			buildPhases = (
 				57B5EB7F51014214100E0A00 /* Sources */,
-				33414904AFEDD61D115948DD /* Resources */,
 			);
 			buildRules = (
 			);
@@ -289,6 +192,9 @@
 			);
 			mainGroup = FB7BE20B30C900CA05D6E644;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				5DB6ED4C120B4C2E45945C70 /* XCLocalSwiftPackageReference "." */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5D783A843E43305E7C0A88CE /* Products */;
 			projectDirPath = "";
@@ -301,18 +207,6 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		33414904AFEDD61D115948DD /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B4C1A031FAC43CBF4F3BC40 /* features.s16 in Resources */,
-				69A1BFAC0DDF9D946A8D04A9 /* golden.json in Resources */,
-				555BE45F29FC10665FF2167D /* stream_fast.s16 in Resources */,
-				E2BE99848C62B37713D2A911 /* stream_hand.s16 in Resources */,
-				A8166F273699BB01139BAA66 /* stream_noise.s16 in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		561DD588C6ACBDFC5C8F9F98 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -329,11 +223,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E82D4D56D063C7A7DE870C8E /* AudioDevicesTests.swift in Sources */,
-				1791DF3349857EDE68A619F3 /* AudioFileReaderTests.swift in Sources */,
-				68247B0AF36EE0D9D8060010 /* DecoderPipelineTests.swift in Sources */,
-				6DC46420FF91B5ED74366CDA /* MorseDecoderTests.swift in Sources */,
-				FBC02155AADBE121BCD33352 /* MorseSynthesizer.swift in Sources */,
-				0B869929B84CA8C65FC5A8BE /* NeuralDecoderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,24 +231,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2836FB6F446A207D942703A0 /* AudioDevices.swift in Sources */,
-				F169FA7D4A3DE844A240B5AE /* AudioFileReader.swift in Sources */,
 				2292580E4AD992F6E636F5EF /* AudioInputService.swift in Sources */,
-				FAFCDE153FF4F7DD7606B95B /* AudioResampler.swift in Sources */,
 				F8644A9C5FD84CD34C6A8A44 /* CWDecodeApp.swift in Sources */,
-				2B7DF3128266AF9656F2F2E7 /* CWNet.mlpackage in Sources */,
-				4BA206D9C8950B5E7E9BB8C2 /* CWNetModel.swift in Sources */,
 				0B2D2FB7D04C214BB1620B73 /* ContentView.swift in Sources */,
-				30F075AD0014E596FAE02397 /* DecoderPipeline.swift in Sources */,
 				06B2EF864CC1F7004B59B013 /* DecoderViewModel.swift in Sources */,
-				809DD5379ED24F8DABA356AA /* FrequencyTracker.swift in Sources */,
-				8E1746828484E9B1919CC1D9 /* Goertzel.swift in Sources */,
-				828481677A484B7F46CA1528 /* MorseCode.swift in Sources */,
-				6088458ACD521EB94B07506D /* MorseDecoder.swift in Sources */,
-				3B1A02758EDE3B40641B3BCA /* NeuralFeatures.swift in Sources */,
-				9B4F17881A7C5D2D1A3D887A /* NeuralPipeline.swift in Sources */,
-				8F6ABD452A288D4E53F97F87 /* PipelineRunner.swift in Sources */,
-				4BF8346A3A8B9C0E39BF865A /* StreamingCTCDecoder.swift in Sources */,
-				DFB6C62A938E555393B049EB /* ToneDetector.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,6 +479,20 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		5DB6ED4C120B4C2E45945C70 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BD78D8829E14BED7BFE3968B /* CWKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CWKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B987F53FAB87412A97E9E073 /* Project object */;
 }

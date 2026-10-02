@@ -1,4 +1,5 @@
 @preconcurrency import AVFoundation
+import CWKit
 
 enum AudioInputError: LocalizedError {
     case permissionDenied
@@ -128,23 +129,5 @@ final class AudioInputService {
         { buffer, _ in
             handler(buffer.monoSamples(), buffer.format.sampleRate)
         }
-    }
-}
-
-extension AVAudioPCMBuffer {
-    /// Averages all channels into a single array of float samples.
-    func monoSamples() -> [Float] {
-        let frames = Int(frameLength)
-        guard frames > 0, let channels = floatChannelData else { return [] }
-        let channelCount = Int(format.channelCount)
-        var mono = Array(UnsafeBufferPointer(start: channels[0], count: frames))
-        guard channelCount > 1 else { return mono }
-        for channel in 1..<channelCount {
-            let data = channels[channel]
-            for i in 0..<frames { mono[i] += data[i] }
-        }
-        let scale = 1 / Float(channelCount)
-        for i in 0..<frames { mono[i] *= scale }
-        return mono
     }
 }

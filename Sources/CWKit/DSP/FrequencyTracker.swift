@@ -1,8 +1,8 @@
 import Foundation
 
 /// Finds the strongest tone in the CW audio passband so the detector can follow it.
-struct FrequencyTracker {
-    static let searchRange: ClosedRange<Double> = 300...1200
+public struct FrequencyTracker {
+    public static let searchRange: ClosedRange<Double> = 300...1200
     private static let step = 5.0
     private static let minimumPeakToMedian: Float = 30  // about 15 dB
 

@@ -1,6 +1,6 @@
 import AVFoundation
 import Testing
-@testable import CWDecode
+@testable import CWKit
 
 struct AudioFileReaderTests {
     @Test func decodesAStereoWAVFile() throws {

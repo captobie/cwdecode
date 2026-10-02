@@ -1,12 +1,12 @@
 import Foundation
 
-enum DecoderKind: String, CaseIterable, Sendable {
+public enum DecoderKind: String, CaseIterable, Sendable {
     /// The CNN + CTC model trained on synthetic CW (`ml/`).
     case neural
     /// Tone detection, threshold and timing rules.
     case classic
 
-    var title: String {
+    public var title: String {
         switch self {
         case .neural: "Neural"
         case .classic: "Classic"
@@ -14,28 +14,42 @@ enum DecoderKind: String, CaseIterable, Sendable {
     }
 }
 
-struct PipelineSettings: Sendable, Equatable {
-    var toneFrequency = 700.0
-    var autoTune = true
+public struct PipelineSettings: Sendable, Equatable {
+    public var toneFrequency = 700.0
+    public var autoTune = true
     /// Minimum signal-to-noise ratio before the key is allowed to close (classic decoder only).
-    var squelchDB = 12.0
-    var initialWPM = 20.0
-    var decoder = DecoderKind.classic
+    public var squelchDB = 12.0
+    public var initialWPM = 20.0
+    public var decoder = DecoderKind.classic
+
+    public init(
+        toneFrequency: Double = 700.0,
+        autoTune: Bool = true,
+        squelchDB: Double = 12.0,
+        initialWPM: Double = 20.0,
+        decoder: DecoderKind = .classic
+    ) {
+        self.toneFrequency = toneFrequency
+        self.autoTune = autoTune
+        self.squelchDB = squelchDB
+        self.initialWPM = initialWPM
+        self.decoder = decoder
+    }
 }
 
-struct PipelineOutput: Sendable {
+public struct PipelineOutput: Sendable {
     /// Newly committed text.
-    var text = ""
-    var keyDown = false
+    public var text = ""
+    public var keyDown = false
     /// Current tone level between the noise floor (0) and the signal peak (1).
-    var signalLevel = 0.0
-    var snrDB = 0.0
-    var toneFrequency = 0.0
-    var wpm = 0.0
+    public var signalLevel = 0.0
+    public var snrDB = 0.0
+    public var toneFrequency = 0.0
+    public var wpm = 0.0
     /// Classic decoder: dits and dahs of the character being received.
-    var pendingSymbols = ""
+    public var pendingSymbols = ""
     /// Neural decoder: text past the last commit point, replaced on every update.
-    var tentativeText = ""
+    public var tentativeText = ""
 }
 
 /// A decoder that turns audio chunks into text. Not thread-safe; confine each instance to one

@@ -1,14 +1,14 @@
 import CoreML
 import Foundation
 
-enum CWNetModelError: LocalizedError {
+public enum CWNetModelError: LocalizedError {
     case missing
     case mismatch(String)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .missing:
-            "The neural decoder's model isn't in the app bundle."
+            "The neural decoder's model isn't in CWKit's resource bundle."
         case .mismatch(let detail):
             "The neural decoder's model doesn't match this version of the app (\(detail))."
         }
@@ -28,15 +28,16 @@ struct LogProbabilities: Sendable {
 
 /// The exported network (`ml/cwmodel/export.py`), run on the CPU so results are deterministic
 /// and match the Python reference; a window takes milliseconds.
-final class CWNetModel: @unchecked Sendable {
+public final class CWNetModel: @unchecked Sendable {
     let vocabulary: [String]
     private let model: MLModel
 
     /// The window size the model accepts, in spectrogram frames.
     static let minimumFrames = 64
 
-    init(bundle: Bundle = Bundle(for: CWNetModel.self)) throws {
-        guard let url = bundle.url(forResource: "CWNet", withExtension: "mlmodelc") else {
+    /// Loads the model bundled with CWKit.
+    public init() throws {
+        guard let url = Bundle.module.url(forResource: "CWNet", withExtension: "mlmodelc") else {
             throw CWNetModelError.missing
         }
         let configuration = MLModelConfiguration()

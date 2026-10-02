@@ -4,6 +4,9 @@ options:
   deploymentTarget:
     macOS: "15.0"
   createIntermediateGroups: true
+packages:
+  CWKit:
+    path: .
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -14,6 +17,8 @@ targets:
     type: application
     platform: macOS
     sources: [CWDecode]
+    dependencies:
+      - package: CWKit
     info:
       path: CWDecode/Info.plist
       properties:

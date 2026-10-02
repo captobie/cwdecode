@@ -1,12 +1,10 @@
 import Foundation
 import Testing
-@testable import CWDecode
+@testable import CWKit
 
 /// Holds the Swift neural decoder to the Python reference (`ml/cwmodel`), using golden files
 /// written by `python -m cwmodel.export`.
 struct NeuralDecoderTests {
-    private final class BundleToken {}
-
     struct Golden: Decodable {
         struct Stream: Decodable {
             var window_s: Double, hop_s: Double, context_s: Double, chunk_s: Double
@@ -27,7 +25,7 @@ struct NeuralDecoderTests {
         var clips: [String: Clip]
     }
 
-    private static let bundle = Bundle(for: BundleToken.self)
+    private static let bundle = Bundle.module
 
     private static let golden: Golden = {
         let url = bundle.url(forResource: "golden", withExtension: "json")!

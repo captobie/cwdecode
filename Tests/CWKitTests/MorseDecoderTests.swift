@@ -1,5 +1,5 @@
 import Testing
-@testable import CWDecode
+@testable import CWKit
 
 struct MorseDecoderTests {
     private func decode(_ elements: [MorseSynthesizer.Element], initialWPM: Double = 20) -> (text: String, decoder: MorseDecoder) {

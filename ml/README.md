@@ -116,9 +116,10 @@ runs in a separate environment pinned to the torch version coremltools is tested
 .venv-export/bin/python -m cwmodel.export --ckpt runs/full/best.pt
 ```
 
-That writes `CWDecode/Model/CWNet.mlpackage` (vocabulary and feature settings in its metadata;
-the app refuses a model that doesn't match its front end) and the golden files in
-`CWDecodeTests/Resources/Neural/`. Commit a new model only when it should ship.
+That writes `Sources/CWKit/Resources/CWNet.mlmodelc`, compiled with Xcode's `coremlcompiler`
+(vocabulary and feature settings in its metadata; the app refuses a model that doesn't match its
+front end), and the golden files in `Tests/CWKitTests/Resources/Neural/`. Commit a new model only
+when it should ship, and tag a CWKit release so apps that depend on it pick it up.
 
 First model (30k steps full stage after 6k clean; 528k parameters):
 

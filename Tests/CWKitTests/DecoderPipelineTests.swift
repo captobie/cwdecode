@@ -1,5 +1,5 @@
 import Testing
-@testable import CWDecode
+@testable import CWKit
 
 struct DecoderPipelineTests {
     private func decode(_ samples: [Float], sampleRate: Double = 48_000, settings: PipelineSettings = PipelineSettings(), chunkSize: Int = 2048) -> (text: String, last: PipelineOutput) {
