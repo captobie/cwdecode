@@ -100,7 +100,13 @@ struct MorseDecoder {
                 dahDuration = mean
             }
         }
-        dahDuration = min(max(dahDuration, 2 * ditDuration), 4.5 * ditDuration)
+        // A dah far longer than 3 dits means the dit estimate is too short (a noise blip
+        // learned as a dit, or a sudden slowdown). Pinning the dah instead would lock in the
+        // bad dit, because the 8-dit clamp above keeps real dits out of the history.
+        if dahDuration > 4.5 * ditDuration {
+            ditDuration = dahDuration / 4.5
+        }
+        dahDuration = max(dahDuration, 2 * ditDuration)
     }
 
     private mutating func learnGap(_ gap: TimeInterval) {

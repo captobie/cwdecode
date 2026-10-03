@@ -53,13 +53,14 @@ enum MorseSynthesizer {
         sampleRate: Double = 48_000,
         amplitude: Float = 0.5,
         noise: Float = 0,
-        seed: UInt64 = 1
+        seed: UInt64 = 1,
+        trailingSilence: TimeInterval = 1.0
     ) -> [Float] {
         var keying: [Bool] = Array(repeating: false, count: Int(0.5 * sampleRate))
         for element in elements(for: text, wpm: wpm) {
             keying += Array(repeating: element.keyDown, count: Int(element.duration * sampleRate))
         }
-        keying += Array(repeating: false, count: Int(1.0 * sampleRate))
+        keying += Array(repeating: false, count: Int(trailingSilence * sampleRate))
 
         let rampSamples = sampleRate * 0.005
         var envelope = 0.0

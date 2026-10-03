@@ -57,4 +57,21 @@ struct DecoderPipelineTests {
         let text = decode(noise).text
         #expect(text.isEmpty, "decoded \(text)")
     }
+
+    /// After a strong signal the peak estimate decays toward the squelch, and an 8 ms noise
+    /// blip in the following silence used to be learned as the dit, locking every later
+    /// element into a dah ("TTTT…") until the pipeline was recreated.
+    @Test func recoversFromANoiseBlipAfterAStrongSignal() {
+        // Seed 20 puts the blip about 2.4 s into the silence after the third repeat.
+        let once = MorseSynthesizer.audio(
+            text: message, wpm: 20, sampleRate: 44_100, amplitude: 0.3, noise: 0.01, seed: 20,
+            trailingSilence: 2.0
+        )
+        let audio = Array([[Float]](repeating: once, count: 5).joined())
+        let result = decode(audio, sampleRate: 44_100)
+        // The blip itself still decodes as a stray "E" (after repeats 3 and 5); what matters
+        // is that every repeat, including those after it, decodes cleanly.
+        #expect(result.text.components(separatedBy: message).count - 1 == 5, "decoded \(result.text)")
+        #expect(abs(result.last.wpm - 20) / 20 < 0.15, "estimated \(result.last.wpm) WPM")
+    }
 }

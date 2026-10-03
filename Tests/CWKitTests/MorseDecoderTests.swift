@@ -53,4 +53,30 @@ struct MorseDecoderTests {
         #expect(text == "E ")
         #expect(decoder.pendingSymbols.isEmpty)
     }
+
+    @Test func recoversWhenANoiseBlipIsLearnedAsTheDit() {
+        // An 8 ms blip, alone between two words, is far shorter than any real dit.
+        var elements = MorseSynthesizer.elements(for: "CQ CQ DE W1AW", wpm: 20)
+        elements += [
+            MorseSynthesizer.Element(keyDown: false, duration: 2),
+            MorseSynthesizer.Element(keyDown: true, duration: 0.008),
+            MorseSynthesizer.Element(keyDown: false, duration: 2),
+        ]
+        elements += MorseSynthesizer.elements(for: "CQ CQ DE W1AW W1AW K", wpm: 20)
+        let result = decode(elements)
+        #expect(result.text.hasSuffix("DE W1AW W1AW K"), "decoded \(result.text)")
+        #expect(abs(result.decoder.estimatedWPM - 20) / 20 < 0.1, "estimated \(result.decoder.estimatedWPM) WPM")
+    }
+
+    /// A slowdown takes about a word longer to settle than a speed-up, because the 8-dit clamp
+    /// on learned marks lets the dah estimate grow only gradually.
+    @Test(arguments: [(10.0, 40.0, "PARIS PARIS PARIS"), (40.0, 10.0, "PARIS PARIS")])
+    func followsASuddenSpeedChange(from: Double, to: Double, settledText: String) {
+        var elements = MorseSynthesizer.elements(for: "PARIS PARIS PARIS", wpm: from)
+        elements.append(MorseSynthesizer.Element(keyDown: false, duration: 7 * 1.2 / from))
+        elements += MorseSynthesizer.elements(for: "PARIS PARIS PARIS PARIS", wpm: to)
+        let result = decode(elements, initialWPM: from)
+        #expect(result.text.hasSuffix(settledText), "decoded \(result.text)")
+        #expect(abs(result.decoder.estimatedWPM - to) / to < 0.1, "estimated \(result.decoder.estimatedWPM) WPM")
+    }
 }
