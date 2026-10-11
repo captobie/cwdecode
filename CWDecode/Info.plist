@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>CWDecode connects to FTX-1 Remote on your network to decode the radio's receive audio.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>CWDecode listens to your audio input to decode Morse code transmissions.</string>
 </dict>

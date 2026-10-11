@@ -36,7 +36,8 @@ final class DecoderViewModel {
 
     private(set) var inputDevices: [AudioInputDevice] = []
     private(set) var defaultInputDevice: AudioInputDevice?
-    /// The chosen input's UID, or nil to follow the system default input.
+    /// The chosen input's UID, `hubInputUID` for the FTX-1 Remote hub, or nil to follow the
+    /// system default input.
     var selectedInputUID: String? {
         didSet {
             guard selectedInputUID != oldValue else { return }
@@ -51,11 +52,21 @@ final class DecoderViewModel {
 
     /// Name of the chosen input when it isn't currently connected.
     var unavailableInputName: String? {
-        guard let selectedInputUID, !inputDevices.contains(where: { $0.uid == selectedInputUID }) else { return nil }
+        guard let selectedInputUID, !isHubInput, !inputDevices.contains(where: { $0.uid == selectedInputUID }) else { return nil }
         return selectedInputName ?? selectedInputUID
     }
 
+    static let hubInputUID = "ftx1-remote-hub"
+
+    var isHubInput: Bool { selectedInputUID == Self.hubInputUID }
+
+    /// Where FTX-1 Remote runs, when listening to its hub.
+    var hubHost: String {
+        didSet { UserDefaults.standard.set(hubHost, forKey: DefaultsKey.hubHost) }
+    }
+
     @ObservationIgnored private let audio = AudioInputService()
+    @ObservationIgnored private let hub = HubAudioService()
     @ObservationIgnored private var deviceMonitor: AudioDeviceMonitor?
     @ObservationIgnored private let runner: PipelineRunner
     @ObservationIgnored private var isStarting = false
@@ -70,6 +81,7 @@ final class DecoderViewModel {
         static let decoder = "decoder"
         static let inputDeviceUID = "inputDeviceUID"
         static let inputDeviceName = "inputDeviceName"
+        static let hubHost = "hubHost"
     }
 
     init() {
@@ -88,6 +100,7 @@ final class DecoderViewModel {
             DefaultsKey.autoTune: PipelineSettings().autoTune,
             DefaultsKey.squelchDB: PipelineSettings().squelchDB,
             DefaultsKey.decoder: DecoderKind.neural.rawValue,
+            DefaultsKey.hubHost: "localhost",
         ])
         let preferred = DecoderKind(rawValue: defaults.string(forKey: DefaultsKey.decoder) ?? "") ?? .neural
         let initial = PipelineSettings(
@@ -103,6 +116,7 @@ final class DecoderViewModel {
         detectedFrequency = initial.toneFrequency
         selectedInputUID = defaults.string(forKey: DefaultsKey.inputDeviceUID)
         selectedInputName = defaults.string(forKey: DefaultsKey.inputDeviceName)
+        hubHost = defaults.string(forKey: DefaultsKey.hubHost) ?? "localhost"
 
         // The stream preserves the order of pipeline output, which matters for the text.
         let (events, continuation) = AsyncStream.makeStream(of: PipelineRunner.Event.self)
@@ -118,6 +132,10 @@ final class DecoderViewModel {
         deviceMonitor = AudioDeviceMonitor { [weak self] in self?.refreshDevices() }
         audio.onConfigurationChange = { [weak self] in
             Task { await self?.restartListening() }
+        }
+        hub.onFailure = { [weak self] error in
+            self?.stopListening()
+            self?.errorMessage = error.localizedDescription
         }
     }
 
@@ -142,9 +160,14 @@ final class DecoderViewModel {
 
         refreshDevices()
         let runner = self.runner
+        let handler: AudioInputService.SampleHandler = { samples, sampleRate in
+            runner.submit(samples, sampleRate: sampleRate)
+        }
         do {
-            try await audio.start(device: currentInputDevice()) { samples, sampleRate in
-                runner.submit(samples, sampleRate: sampleRate)
+            if isHubInput {
+                try hub.start(host: hubHost, handler: handler)
+            } else {
+                try await audio.start(device: currentInputDevice(), handler: handler)
             }
             isListening = true
         } catch {
@@ -155,6 +178,7 @@ final class DecoderViewModel {
     func stopListening() {
         guard isListening else { return }
         audio.stop()
+        hub.stop()
         runner.finish()
         isListening = false
     }
@@ -264,7 +288,7 @@ final class DecoderViewModel {
         }
         // Follow along if the device we'd pick now isn't the one we're listening to,
         // e.g. the system default changed or the chosen device was reconnected.
-        if isListening, (try? currentInputDevice())?.id != audio.deviceID {
+        if isListening, !isHubInput, (try? currentInputDevice())?.id != audio.deviceID {
             Task { await restartListening() }
         }
     }

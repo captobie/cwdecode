@@ -25,12 +25,14 @@ targets:
         CFBundleDisplayName: CWDecode
         LSApplicationCategoryType: public.app-category.utilities
         NSMicrophoneUsageDescription: CWDecode listens to your audio input to decode Morse code transmissions.
+        NSLocalNetworkUsageDescription: CWDecode connects to FTX-1 Remote on your network to decode the radio's receive audio.
     entitlements:
       path: CWDecode/CWDecode.entitlements
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.device.audio-input: true
         com.apple.security.files.user-selected.read-only: true
+        com.apple.security.network.client: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWDecode

@@ -30,7 +30,9 @@ struct ContentView: View {
                     Label(model.isListening ? "Stop" : "Listen",
                           systemImage: model.isListening ? "stop.fill" : "mic.fill")
                 }
-                .help(model.isListening ? "Stop decoding the audio input" : "Decode the default audio input")
+                .help(model.isListening ? "Stop decoding the audio input" : model.isHubInput
+                      ? "Decode the receive audio from the FTX-1 Remote hub"
+                      : "Decode the selected audio input")
                 .disabled(model.isDecodingFile)
 
                 Button {
@@ -83,23 +85,35 @@ private struct InputDevicePicker: View {
     var body: some View {
         @Bindable var model = model
 
-        Picker("Input", selection: $model.selectedInputUID) {
-            Label(defaultTitle, systemImage: "mic")
-                .tag(String?.none)
-            if !model.inputDevices.isEmpty {
+        HStack {
+            Picker("Input", selection: $model.selectedInputUID) {
+                Label(defaultTitle, systemImage: "mic")
+                    .tag(String?.none)
+                if !model.inputDevices.isEmpty {
+                    Divider()
+                }
+                ForEach(model.inputDevices) { device in
+                    Text(device.name).tag(Optional(device.uid))
+                }
                 Divider()
+                Text("FTX-1 Remote Hub").tag(Optional(DecoderViewModel.hubInputUID))
+                if let name = model.unavailableInputName {
+                    Divider()
+                    Text("\(name) (not connected)").tag(model.selectedInputUID)
+                }
             }
-            ForEach(model.inputDevices) { device in
-                Text(device.name).tag(Optional(device.uid))
-            }
-            if let name = model.unavailableInputName {
-                Divider()
-                Text("\(name) (not connected)").tag(model.selectedInputUID)
+            .pickerStyle(.menu)
+            .frame(maxWidth: model.isHubInput ? 170 : 260)
+            .help("Audio input to decode")
+
+            if model.isHubInput {
+                TextField("Hub host", text: $model.hubHost)
+                    .textFieldStyle(.roundedBorder)
+                    .frame(width: 110)
+                    .disabled(model.isListening)
+                    .help("The Mac running FTX-1 Remote: localhost, or its name or address on your network or Tailscale. Port \(HubAudioFormat.port).")
             }
         }
-        .pickerStyle(.menu)
-        .frame(maxWidth: 260)
-        .help("Audio input to decode")
     }
 
     private var defaultTitle: String {
