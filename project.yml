@@ -52,6 +52,35 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWDecodeTests
         CODE_SIGN_IDENTITY: "-"
+  CWSynth:
+    type: application
+    platform: macOS
+    sources: [CWSynth]
+    info:
+      path: CWSynth/Info.plist
+      properties:
+        CFBundleDisplayName: CWSynth
+        LSApplicationCategoryType: public.app-category.developer-tools
+        # Where cwsynth and its .venv live; the app lets you pick another folder.
+        CWSynthMLFolder: $(SRCROOT)/ml
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWSynth
+        # Not sandboxed: it runs the repo's Python environment and writes wherever you choose.
+        ENABLE_APP_SANDBOX: NO
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+  CWSynthTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [CWSynthTests]
+    dependencies:
+      - target: CWSynth
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlobermeier.CWSynthTests
+        CODE_SIGN_IDENTITY: "-"
 schemes:
   CWDecode:
     build:
@@ -62,3 +91,12 @@ schemes:
     test:
       config: Debug
       targets: [CWDecodeTests]
+  CWSynth:
+    build:
+      targets:
+        CWSynth: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets: [CWSynthTests]

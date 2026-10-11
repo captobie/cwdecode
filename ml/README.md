@@ -33,6 +33,23 @@ Roughly 560 samples/s on an 8-core Mac and ~185 MB per 1,000 samples (median cli
 For training, `cwsynth.generate(seed)` produces the same samples in memory, so an on-the-fly
 dataset needs no disk at all.
 
+### Targeted sets (the CWSynth app)
+
+The `CWSynth` Mac app (see the top-level README) is a front end for `python -m cwsynth job`: it
+sends one JSON request on stdin and reads events back on stdout. The protocol is documented in
+`cwsynth/job.py`. It writes a normal dataset, including the custom text lines in `dataset.json`.
+To train with a set it made, mix its train split into the on-the-fly stream:
+
+```sh
+.venv/bin/python -m cwmodel.train --stage full --init runs/full/best.pt --out runs/targeted \
+    --extra-train data/hand-low-snr/train.jsonl --extra-share 0.2
+```
+
+`--extra-train` can be repeated. It only accepts the train split of a cwsynth dataset, so val/test
+sets and the W1AW library can't end up in training. Use val or test sets from the app with
+`--val` or `cwmodel.evaluate`. Custom lines don't follow the callsign train/val/test split, so
+don't put the same lines in a train set and an evaluation set.
+
 ## Labels
 
 - **Vocabulary:** `A–Z 0–9 . , ? / - @ '`, `<AR> <BT> <KN> <SK> <AS>`, and space. CTC blank

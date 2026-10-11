@@ -153,7 +153,9 @@ def _uniform(rng: np.random.Generator, bounds: tuple[float, float]) -> float:
 
 
 def _log_uniform(rng: np.random.Generator, bounds: tuple[float, float]) -> float:
-    return float(np.exp(rng.uniform(np.log(bounds[0]), np.log(bounds[1]))))
+    value = float(np.exp(rng.uniform(np.log(bounds[0]), np.log(bounds[1]))))
+    # A fixed value (equal ends) stays exact; the draw above still advances the stream.
+    return float(bounds[0]) if bounds[0] == bounds[1] else value
 
 
 def sample_fist(rng: np.random.Generator, style: FistStyle) -> FistParams:

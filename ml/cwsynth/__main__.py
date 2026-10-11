@@ -3,6 +3,7 @@
     python -m cwsynth render "CQ DE K1ABC <AR>" --wpm 22 --snr -3 --fist straight -o test.wav
     python -m cwsynth dataset --config configs/default.toml --split train --n 20000 --out data/synth-v1
     python -m cwsynth preview data/synth-v1 --split train --n 20 --png previews/
+    python -m cwsynth job < request.json        # JSON in, JSON lines out (see cwsynth/job.py)
 """
 import argparse
 import dataclasses
@@ -13,6 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
+from cwsynth import job
 from cwsynth.alphabet import normalize
 from cwsynth.corpus import SPLITS, CorpusMix
 from cwsynth.dataset import read_wav, write_dataset, write_wav
@@ -151,6 +153,9 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--skip", type=int, default=0)
     p.add_argument("--png", help="folder for spectrogram images")
     p.set_defaults(func=cmd_preview)
+
+    j = sub.add_parser("job", help="run one JSON request from stdin (for the CWSynth app)")
+    j.set_defaults(func=lambda _: job.main())
 
     args = parser.parse_args(argv)
     args.func(args)

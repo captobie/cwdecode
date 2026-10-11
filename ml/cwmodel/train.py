@@ -3,6 +3,7 @@
     python -m cwmodel.train --overfit 100 --out runs/overfit          # wiring check: CER → 0
     python -m cwmodel.train --stage clean --steps 6000 --out runs/clean
     python -m cwmodel.train --stage full --steps 30000 --init runs/clean/best.pt --out runs/full
+    python -m cwmodel.train ... --extra-train data/hand-low-snr/train.jsonl --extra-share 0.2
 
 Stages: `clean` has every fist, speed, tone and text but no channel impairments; `full` uses
 the default conditions (noise, fading, static, interference, filters). Every `--eval-every`
@@ -89,7 +90,8 @@ def train(args: argparse.Namespace, device: str) -> None:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     ranges = ConditionRanges(**STAGES[args.stage])
-    stream = SyntheticStream(ranges, base_seed=args.seed, crop_prob=args.crop_prob)
+    stream = SyntheticStream(ranges, base_seed=args.seed, crop_prob=args.crop_prob,
+                             extra_train=args.extra_train, extra_share=args.extra_share)
     loader = DataLoader(BucketedBatches(stream, args.batch), batch_size=None, num_workers=args.workers,
                         persistent_workers=args.workers > 0, prefetch_factor=4 if args.workers else None)
     model = CwNet().to(device)
@@ -158,6 +160,10 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=1)
     parser.add_argument("--crop-prob", type=float, default=0.3)
     parser.add_argument("--init", help="start from this checkpoint")
+    parser.add_argument("--extra-train", action="append", default=[], metavar="MANIFEST",
+                        help="a cwsynth train.jsonl to mix in (repeatable), e.g. from the CWSynth app")
+    parser.add_argument("--extra-share", type=float, default=0.2,
+                        help="share of training samples drawn from --extra-train manifests")
     parser.add_argument("--eval-every", type=int, default=2000)
     parser.add_argument("--val", default="data/synth-v1/val.jsonl")
     parser.add_argument("--val-limit", type=int, default=600)

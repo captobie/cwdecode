@@ -53,16 +53,42 @@ def encode_item(audio: np.ndarray, text: str, meta: dict) -> dict:
             "text": "".join(tokens), "meta": meta}
 
 
+def load_extra_train(manifests: list[str | Path]) -> list[tuple[Path, dict]]:
+    """(dataset root, row) for every row of extra training manifests. Only train splits of
+    cwsynth datasets are accepted, so a val/test set or the W1AW evaluation library (which
+    must never be trained on) can't slip in."""
+    rows = []
+    for manifest in manifests:
+        path = Path(manifest)
+        info = path.parent / "dataset.json"
+        if not info.exists() or json.loads(info.read_text()).get("generator") != "cwsynth":
+            raise ValueError(f"{path}: not a cwsynth dataset (no dataset.json from cwsynth next to it)")
+        for line in path.read_text().splitlines():
+            row = json.loads(line)
+            if row.get("split") != "train":
+                raise ValueError(f"{path}: only train splits can be trained on, found {row.get('split')!r}")
+            rows.append((path.parent, row))
+    return rows
+
+
 class SyntheticStream(IterableDataset):
     """Endless samples from cwsynth.generate. Sample k is fixed by (base_seed, k), and the
-    workers take every n-th k, so a run is reproducible for a given worker count."""
+    workers take every n-th k, so a run is reproducible for a given worker count.
+
+    With `extra_train` manifests, a share `extra_share` of samples is instead a random row
+    of those (e.g. a targeted set from the CWSynth app), cropped the same way."""
 
     def __init__(self, ranges: ConditionRanges | None = None, corpus_weights: dict | None = None,
-                 base_seed: int = 1, crop_prob: float = 0.3):
+                 base_seed: int = 1, crop_prob: float = 0.3,
+                 extra_train: list[str | Path] | None = None, extra_share: float = 0.0):
         self.ranges = ranges or ConditionRanges()
         self.corpus_weights = corpus_weights
         self.base_seed = base_seed
         self.crop_prob = crop_prob
+        self.extra_train = list(extra_train or [])
+        self.extra_share = extra_share
+        if self.extra_train:
+            load_extra_train(self.extra_train)  # fail now rather than in a worker
 
     def __iter__(self):
         info = get_worker_info()
@@ -72,17 +98,26 @@ class SyntheticStream(IterableDataset):
             # others for the CPU and the GPU sits waiting for data.
             torch.set_num_threads(1)
         corpus = CorpusMix(self.corpus_weights)
+        extra = load_extra_train(self.extra_train) if self.extra_train else []
         k = worker
         while True:
             seed = int(np.random.SeedSequence([self.base_seed, k]).generate_state(1, np.uint64)[0])
             k += workers
-            sample = generate(seed, self.ranges, corpus)
-            audio, text = sample.audio, sample.text
+            pick = np.random.default_rng(seed ^ 0xE8A7) if extra else None
+            if pick is not None and pick.random() < self.extra_share:
+                root, row = extra[int(pick.integers(len(extra)))]
+                audio, sr = read_wav(root / row["audio"])
+                if sr != SAMPLE_RATE:
+                    raise ValueError(f"{row['audio']}: expected {SAMPLE_RATE} Hz, got {sr}")
+                text, alignment, source = row["text"], row["alignment"], f"extra:{row['source']}"
+            else:
+                sample = generate(seed, self.ranges, corpus)
+                audio, text, alignment, source = sample.audio, sample.text, sample.alignment, sample.source
             rng = np.random.default_rng(seed ^ 0x5EED)
             if text and rng.random() < self.crop_prob:
-                audio, text = crop_at_gaps(audio, text, sample.alignment, rng)
+                audio, text = crop_at_gaps(audio, text, alignment, rng)
             if ctc_feasible(len(audio), tokenize(text)):
-                yield encode_item(audio, text, {"source": sample.source, "seed": seed})
+                yield encode_item(audio, text, {"source": source, "seed": seed})
 
 
 class BucketedBatches(IterableDataset):

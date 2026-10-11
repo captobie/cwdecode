@@ -73,3 +73,33 @@ def test_collate_pads_and_keeps_lengths():
     assert batch["spec"].shape == (2, 1, N_BINS, 256)   # 251 frames, padded to a multiple of 128
     assert batch["frames"].tolist() == [n_frames(8000), n_frames(16000)]
     assert batch["target_lengths"].tolist() == [1, 2]
+
+
+def _extra_dataset(root, split="train"):
+    from cwsynth.corpus import CorpusMix
+    from cwsynth.dataset import write_dataset
+    from cwsynth.spec import ConditionRanges
+    write_dataset(root, 3, split=split, ranges=ConditionRanges(clean_prob=1.0, qrm_prob=0.0),
+                  corpus=CorpusMix(lines=["EXTRA TEXT"]), workers=1, progress=False)
+    return root / f"{split}.jsonl"
+
+
+def test_extra_train_manifests_are_mixed_in(tmp_path):
+    from itertools import islice
+
+    from cwmodel.data import SyntheticStream
+    stream = SyntheticStream(crop_prob=0.0, extra_train=[_extra_dataset(tmp_path)], extra_share=0.5)
+    items = list(islice(iter(stream), 40))
+    extra = [it for it in items if it["meta"]["source"] == "extra:custom"]
+    assert 8 < len(extra) < 32
+    assert all(it["text"] == "EXTRA TEXT" for it in extra)
+
+
+def test_extra_train_rejects_eval_data(tmp_path):
+    from cwmodel.data import load_extra_train
+    with pytest.raises(ValueError, match="only train splits"):
+        load_extra_train([_extra_dataset(tmp_path, split="val")])
+    (tmp_path / "w1aw").mkdir()
+    (tmp_path / "w1aw" / "clips.jsonl").write_text('{"split": "train"}\n')
+    with pytest.raises(ValueError, match="not a cwsynth dataset"):
+        load_extra_train([tmp_path / "w1aw" / "clips.jsonl"])

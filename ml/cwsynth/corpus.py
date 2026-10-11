@@ -207,9 +207,15 @@ def clean_text(text: str) -> str:
 
 class CorpusMix:
     """Weighted mix of text sources. `text_file` replaces the bundled word list as the
-    source of plain English (random spans of its words, punctuation kept where sendable)."""
+    source of plain English (random spans of its words, punctuation kept where sendable).
+    `lines`, if given, replaces the mix for the sampled text: sample `i` of a dataset sends
+    line `i mod len(lines)`. Interfering stations still draw from the weighted mix."""
 
-    def __init__(self, weights: dict[str, float] | None = None, text_file: str | Path | None = None):
+    def __init__(self, weights: dict[str, float] | None = None, text_file: str | Path | None = None,
+                 lines: list[str] | None = None):
+        self.lines = [normalize(line) for line in lines] if lines else None
+        if self.lines is not None and not all(self.lines):
+            raise ValueError("custom text lines must not be empty")
         self.weights = dict(weights or DEFAULT_WEIGHTS)
         unknown = set(self.weights) - set(DEFAULT_WEIGHTS)
         if unknown:
@@ -250,6 +256,13 @@ class CorpusMix:
         """(source name, text). Noise-only samples have empty text."""
         source = self.sources[int(rng.choice(len(self.sources), p=self.p))]
         return source, self._generate(source, rng, split)
+
+    def sample_at(self, index: int, rng: np.random.Generator, split: str = "train") -> tuple[str, str]:
+        """(source name, text) for sample `index` of a dataset: a custom line if there are
+        any, otherwise a draw from the mix."""
+        if self.lines is not None:
+            return "custom", self.lines[index % len(self.lines)]
+        return self.sample(rng, split)
 
     def sample_text(self, rng: np.random.Generator, split: str = "train") -> str:
         """Non-empty text, e.g. for an interfering station."""

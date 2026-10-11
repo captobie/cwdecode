@@ -25,9 +25,19 @@ open CWDecode.xcodeproj
 
 Run `xcodegen generate` again after adding or removing files. To sign with your own team, set `DEVELOPMENT_TEAM` in `project.yml` (it currently signs to run locally).
 
-Tests: `swift test` for the decoders (`CWKit`), `xcodebuild -project CWDecode.xcodeproj -scheme CWDecode test` for the app.
+Tests: `swift test` for the decoders (`CWKit`), `xcodebuild -project CWDecode.xcodeproj -scheme CWDecode test` for the app, `-scheme CWSynth test` for CWSynth (its job tests run Python and skip without `ml/.venv`).
 
 The neural decoder's model (`Sources/CWKit/Resources/CWNet.mlmodelc`, compiled, since SwiftPM can't compile an `.mlpackage` resource) is committed, so building needs no Python. It's trained and exported from `ml/` (see [`ml/README.md`](ml/README.md)); the export also rewrites the golden files in `Tests/CWKitTests/Resources/Neural/` that hold the Swift front end, model and streaming decoder to the Python reference.
+
+## CWSynth: making training files
+
+`CWSynth` (second scheme in the project) is a small Mac app for making labeled training and test
+sets. You choose the text (cwsynth's mix or your own lines), pitch, speed, fist, SNR, and how often
+fading, static, interference and receiver filtering appear. Each of these can be one fixed value or
+a range. Preview plays a clip exactly as it will be written, and Generate writes a standard
+cwsynth dataset (WAVs plus a JSONL manifest). The app runs `ml/cwsynth` in the repo's Python
+environment (`ml/.venv`, see [`ml/README.md`](ml/README.md)), so its files match what the model is
+trained on. It's a developer tool: it isn't sandboxed and isn't shipped.
 
 ## CWKit
 

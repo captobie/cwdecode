@@ -7,19 +7,33 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05876E7D90F58F40CF021BA0 /* SynthSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50B1F8866D89C9B5975FDA3B /* SynthSettingsTests.swift */; };
 		06B2EF864CC1F7004B59B013 /* DecoderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D07CBF7D928389CE6AF26B2 /* DecoderViewModel.swift */; };
 		0B2D2FB7D04C214BB1620B73 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A18A68FB1E3C86C20FC258B /* ContentView.swift */; };
 		2292580E4AD992F6E636F5EF /* AudioInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B1CFA836A3BF6CFAE4592E /* AudioInputService.swift */; };
 		2836FB6F446A207D942703A0 /* AudioDevices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15C3C1508E00AF9F9A0DB98C /* AudioDevices.swift */; };
 		2D6846B59C228125ABD1F9B1 /* HubAudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A906662C485756D2D276DD85 /* HubAudioService.swift */; };
 		493BA90D36D438E0FC2A654D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E5FD60A04E627C2179F56D7B /* Assets.xcassets */; };
+		6EEEE63D877727816F1F373E /* CWSynthApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3574DAB4C8173CE7A3D9C91 /* CWSynthApp.swift */; };
+		892BE042D203FB2BE5EA1BA7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B3E9002EA8B8A2A993BDAF /* ContentView.swift */; };
 		A637C20634B54398018A32FC /* CWKit in Frameworks */ = {isa = PBXBuildFile; productRef = BD78D8829E14BED7BFE3968B /* CWKit */; };
+		B86F55CF622F672DFFEB0AF4 /* SynthSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C6D89488422E01EA16C90D8 /* SynthSettings.swift */; };
+		BFB31B466C4032E9B2B069A7 /* SynthJobTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 195BF56BA1C56BBCCF065CC4 /* SynthJobTests.swift */; };
+		C8E5C74589F4C8961ADDAF78 /* SynthJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 163C85AEC61E7B33F467E67C /* SynthJob.swift */; };
+		D0C095EAC0DAA9736744EEF8 /* SynthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B6CFB2DACBBE4E12454B611 /* SynthViewModel.swift */; };
 		D6B12F9D012F7F67223BFA54 /* HubAudioFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CCF08F2F6E41A47B1977C05 /* HubAudioFormatTests.swift */; };
 		E82D4D56D063C7A7DE870C8E /* AudioDevicesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAA5C3CBDF193020BA619965 /* AudioDevicesTests.swift */; };
 		F8644A9C5FD84CD34C6A8A44 /* CWDecodeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9A3C7E1FD6BE0C3BF33722F /* CWDecodeApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		3B0360065F13E80A373EE519 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B987F53FAB87412A97E9E073 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8A920110CF488C3D81AF8FE4;
+			remoteInfo = CWSynth;
+		};
 		F1F03ECB693A87660165AF14 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B987F53FAB87412A97E9E073 /* Project object */;
@@ -30,17 +44,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0C6D89488422E01EA16C90D8 /* SynthSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthSettings.swift; sourceTree = "<group>"; };
 		12611F50C5E4123E67FD43A6 /* cwdecode */ = {isa = PBXFileReference; lastKnownFileType = folder; name = cwdecode; path = .; sourceTree = SOURCE_ROOT; };
 		12E2172BC38A84C2E06B0534 /* CWDecodeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CWDecodeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		15C3C1508E00AF9F9A0DB98C /* AudioDevices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevices.swift; sourceTree = "<group>"; };
+		163C85AEC61E7B33F467E67C /* SynthJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthJob.swift; sourceTree = "<group>"; };
+		195BF56BA1C56BBCCF065CC4 /* SynthJobTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthJobTests.swift; sourceTree = "<group>"; };
 		1C20DDB1A4A22A594394DDCF /* CWDecode.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CWDecode.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24B1CFA836A3BF6CFAE4592E /* AudioInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioInputService.swift; sourceTree = "<group>"; };
+		3B6CFB2DACBBE4E12454B611 /* SynthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthViewModel.swift; sourceTree = "<group>"; };
 		4D07CBF7D928389CE6AF26B2 /* DecoderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecoderViewModel.swift; sourceTree = "<group>"; };
+		50B1F8866D89C9B5975FDA3B /* SynthSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthSettingsTests.swift; sourceTree = "<group>"; };
 		580FCD89870C431B52BBFD87 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5A18A68FB1E3C86C20FC258B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5CCF08F2F6E41A47B1977C05 /* HubAudioFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubAudioFormatTests.swift; sourceTree = "<group>"; };
+		63F9066F40A3C9028C141622 /* CWSynthTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CWSynthTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		978EA8ECF62028D088A600E0 /* CWSynth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CWSynth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7B3E9002EA8B8A2A993BDAF /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A906662C485756D2D276DD85 /* HubAudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HubAudioService.swift; sourceTree = "<group>"; };
 		AAA5C3CBDF193020BA619965 /* AudioDevicesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDevicesTests.swift; sourceTree = "<group>"; };
+		B280C9ED6C9B022D8AF37877 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B3574DAB4C8173CE7A3D9C91 /* CWSynthApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWSynthApp.swift; sourceTree = "<group>"; };
 		DB0B29D3CFD34850ABD5AA11 /* CWDecode.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CWDecode.entitlements; sourceTree = "<group>"; };
 		E5FD60A04E627C2179F56D7B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E9A3C7E1FD6BE0C3BF33722F /* CWDecodeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CWDecodeApp.swift; sourceTree = "<group>"; };
@@ -58,6 +82,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0A99233CBD99985AE54A8A7E /* CWSynth */ = {
+			isa = PBXGroup;
+			children = (
+				B280C9ED6C9B022D8AF37877 /* Info.plist */,
+				7AEC6DE327DFF6AA14E824A5 /* App */,
+				F73CD31F5A1A8485B5250F15 /* Model */,
+				183CEE019F930311539499D8 /* Views */,
+			);
+			path = CWSynth;
+			sourceTree = "<group>";
+		};
+		183CEE019F930311539499D8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A7B3E9002EA8B8A2A993BDAF /* ContentView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		215253F1647D8C7547534E11 /* Audio */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,8 +133,19 @@
 			children = (
 				1C20DDB1A4A22A594394DDCF /* CWDecode.app */,
 				12E2172BC38A84C2E06B0534 /* CWDecodeTests.xctest */,
+				978EA8ECF62028D088A600E0 /* CWSynth.app */,
+				63F9066F40A3C9028C141622 /* CWSynthTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7AEC6DE327DFF6AA14E824A5 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				B3574DAB4C8173CE7A3D9C91 /* CWSynthApp.swift */,
+				3B6CFB2DACBBE4E12454B611 /* SynthViewModel.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		A989B70BB671812E48AC7587 /* App */ = {
@@ -124,14 +178,34 @@
 			path = CWDecode;
 			sourceTree = "<group>";
 		};
+		F73CD31F5A1A8485B5250F15 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				163C85AEC61E7B33F467E67C /* SynthJob.swift */,
+				0C6D89488422E01EA16C90D8 /* SynthSettings.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		FB7BE20B30C900CA05D6E644 = {
 			isa = PBXGroup;
 			children = (
 				E3579F306576A42733A74DE5 /* CWDecode */,
 				309B09D40DEBAC1EAA32F105 /* CWDecodeTests */,
+				0A99233CBD99985AE54A8A7E /* CWSynth */,
+				FEA44D0CBE2345CCB3630B34 /* CWSynthTests */,
 				B5C1A5C6D35A726028F136FB /* Packages */,
 				5D783A843E43305E7C0A88CE /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		FEA44D0CBE2345CCB3630B34 /* CWSynthTests */ = {
+			isa = PBXGroup;
+			children = (
+				195BF56BA1C56BBCCF065CC4 /* SynthJobTests.swift */,
+				50B1F8866D89C9B5975FDA3B /* SynthSettingsTests.swift */,
+			);
+			path = CWSynthTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -157,6 +231,23 @@
 			productReference = 1C20DDB1A4A22A594394DDCF /* CWDecode.app */;
 			productType = "com.apple.product-type.application";
 		};
+		8A920110CF488C3D81AF8FE4 /* CWSynth */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CA1356403847D8A56F1A2A87 /* Build configuration list for PBXNativeTarget "CWSynth" */;
+			buildPhases = (
+				AA20FF771A54724ABFD5DBB9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CWSynth;
+			packageProductDependencies = (
+			);
+			productName = CWSynth;
+			productReference = 978EA8ECF62028D088A600E0 /* CWSynth.app */;
+			productType = "com.apple.product-type.application";
+		};
 		98025FA10882D84095417114 /* CWDecodeTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 14600929C14838C3A1C96E6F /* Build configuration list for PBXNativeTarget "CWDecodeTests" */;
@@ -175,6 +266,24 @@
 			productReference = 12E2172BC38A84C2E06B0534 /* CWDecodeTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		D134C1DFD4C1A05F5A034698 /* CWSynthTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 51C854DAE5381B12B950C4AC /* Build configuration list for PBXNativeTarget "CWSynthTests" */;
+			buildPhases = (
+				9B9A4F66B2F42C8AA24A6EE6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F085C508377435B4F97ABD00 /* PBXTargetDependency */,
+			);
+			name = CWSynthTests;
+			packageProductDependencies = (
+			);
+			productName = CWSynthTests;
+			productReference = 63F9066F40A3C9028C141622 /* CWSynthTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -185,6 +294,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					2A456967BC4FF6BA80EEBBBA = {
+						ProvisioningStyle = Automatic;
+					};
+					8A920110CF488C3D81AF8FE4 = {
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -208,6 +320,8 @@
 			targets = (
 				2A456967BC4FF6BA80EEBBBA /* CWDecode */,
 				98025FA10882D84095417114 /* CWDecodeTests */,
+				8A920110CF488C3D81AF8FE4 /* CWSynth */,
+				D134C1DFD4C1A05F5A034698 /* CWSynthTests */,
 			);
 		};
 /* End PBXProject section */
@@ -233,6 +347,27 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9B9A4F66B2F42C8AA24A6EE6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFB31B466C4032E9B2B069A7 /* SynthJobTests.swift in Sources */,
+				05876E7D90F58F40CF021BA0 /* SynthSettingsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA20FF771A54724ABFD5DBB9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EEEE63D877727816F1F373E /* CWSynthApp.swift in Sources */,
+				892BE042D203FB2BE5EA1BA7 /* ContentView.swift in Sources */,
+				C8E5C74589F4C8961ADDAF78 /* SynthJob.swift in Sources */,
+				B86F55CF622F672DFFEB0AF4 /* SynthSettings.swift in Sources */,
+				D0C095EAC0DAA9736744EEF8 /* SynthViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4BE507A4DA11E22B6567FF6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -254,9 +389,32 @@
 			target = 2A456967BC4FF6BA80EEBBBA /* CWDecode */;
 			targetProxy = F1F03ECB693A87660165AF14 /* PBXContainerItemProxy */;
 		};
+		F085C508377435B4F97ABD00 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8A920110CF488C3D81AF8FE4 /* CWSynth */;
+			targetProxy = 3B0360065F13E80A373EE519 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		34FAE24B67F87C20F16FA54A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				INFOPLIST_FILE = CWSynth/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.carlobermeier.CWSynth;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
 		4C3B311E358808C8EB3274D0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -335,6 +493,42 @@
 			};
 			name = Release;
 		};
+		7EE7AD797D488C52A0FB04A8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_APP_SANDBOX = NO;
+				INFOPLIST_FILE = CWSynth/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.carlobermeier.CWSynth;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		973EAD14247CAEE4B7F17380 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.carlobermeier.CWSynthTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CWSynth.app/Contents/MacOS/CWSynth";
+			};
+			name = Debug;
+		};
 		AD2D320D1D2EF222B8DFE03C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -399,6 +593,24 @@
 				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
+		};
+		CBDCB485EA6E654373C71A6E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.carlobermeier.CWSynthTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CWSynth.app/Contents/MacOS/CWSynth";
+			};
+			name = Release;
 		};
 		E3729D9EAE6B5B1F94E009F1 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -477,11 +689,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		51C854DAE5381B12B950C4AC /* Build configuration list for PBXNativeTarget "CWSynthTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				973EAD14247CAEE4B7F17380 /* Debug */,
+				CBDCB485EA6E654373C71A6E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		C95D435C6337B0768F4AB155 /* Build configuration list for PBXNativeTarget "CWDecode" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E3729D9EAE6B5B1F94E009F1 /* Debug */,
 				4C3B311E358808C8EB3274D0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CA1356403847D8A56F1A2A87 /* Build configuration list for PBXNativeTarget "CWSynth" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				34FAE24B67F87C20F16FA54A /* Debug */,
+				7EE7AD797D488C52A0FB04A8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

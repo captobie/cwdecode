@@ -18,7 +18,7 @@ from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -78,20 +78,28 @@ def manifest_record(sample: Sample, sample_id: str, audio_path: str, split: str)
 _worker: dict[str, Any] = {}
 
 
+def make_sample(index: int, seed: int, ranges: ConditionRanges, corpus: CorpusMix,
+                split: str) -> Sample:
+    """Sample `index` of a split whose per-sample seed is `seed` (see `sample_seed`)."""
+    rng = np.random.default_rng(seed)
+    source, text = corpus.sample_at(index, rng, split)
+    spec = sample_spec(rng, text, ranges, qrm_text=lambda r: corpus.sample_text(r, split))
+    sample = render(spec)
+    sample.source = source
+    return sample
+
+
 def _init_worker(ranges: ConditionRanges, weights: dict[str, float], text_file: str | None,
-                 out_dir: str, split: str) -> None:
-    _worker.update(ranges=ranges, corpus=CorpusMix(weights, text_file),
+                 lines: list[str] | None, out_dir: str, split: str) -> None:
+    _worker.update(ranges=ranges, corpus=CorpusMix(weights, text_file, lines),
                    out_dir=Path(out_dir), split=split)
 
 
 def _make_one(job: tuple[int, int]) -> dict[str, Any]:
     index, seed = job
-    split, corpus, out_dir = _worker["split"], _worker["corpus"], _worker["out_dir"]
-    rng = np.random.default_rng(seed)
-    source, text = corpus.sample(rng, split)
-    spec = sample_spec(rng, text, _worker["ranges"], qrm_text=lambda r: corpus.sample_text(r, split))
-    sample = render(spec)
-    sample.source = source
+    split, out_dir = _worker["split"], _worker["out_dir"]
+    sample = make_sample(index, seed, _worker["ranges"], _worker["corpus"], split)
+    spec = sample.spec
 
     sample_id = f"{split}-{index:07d}"
     relative = Path("audio") / split / f"{index // FILES_PER_FOLDER:04d}" / f"{sample_id}.wav"
@@ -111,9 +119,11 @@ def _git_commit() -> str | None:
 def write_dataset(out_dir: str | Path, n: int, split: str = "train",
                   ranges: ConditionRanges | None = None, corpus: CorpusMix | None = None,
                   seed: int = 0, start: int = 0, workers: int | None = None,
-                  overwrite: bool = False, progress: bool = True) -> Path:
+                  overwrite: bool = False, progress: bool = True,
+                  on_progress: Callable[[int, int], None] | None = None) -> Path:
     """Write samples `start .. start+n-1` of `split`. With `start > 0` the manifest is
-    appended to (extending a split); otherwise an existing manifest needs `overwrite`."""
+    appended to (extending a split); otherwise an existing manifest needs `overwrite`.
+    `on_progress(done, n)` is called after each sample."""
     if split not in SPLITS:
         raise ValueError(f"split must be one of {SPLITS}")
     ranges = ranges or ConditionRanges()
@@ -126,12 +136,14 @@ def write_dataset(out_dir: str | Path, n: int, split: str = "train",
 
     jobs = [(i, sample_seed(seed, split, i)) for i in range(start, start + n)]
     workers = workers or os.cpu_count() or 1
-    init_args = (ranges, corpus.weights, corpus.text_file, str(out), split)
+    init_args = (ranges, corpus.weights, corpus.text_file, corpus.lines, str(out), split)
     began = time.monotonic()
 
     with open(manifest, "a" if start else "w", encoding="utf-8") as f:
         def emit(k: int, record: dict[str, Any]) -> None:
             f.write(json.dumps(record, separators=(",", ":")) + "\n")
+            if on_progress:
+                on_progress(k + 1, n)
             if progress and (k + 1) % 500 == 0:
                 rate = (k + 1) / (time.monotonic() - began)
                 print(f"  {split}: {k + 1}/{n} ({rate:.0f}/s)", file=sys.stderr)
@@ -161,7 +173,7 @@ def _update_info(out: Path, split: str, n: int, start: int, seed: int,
         "count": start + n if start else n,
         "seed": seed,
         "conditions": asdict(ranges),
-        "corpus": {"weights": corpus.weights, "text_file": corpus.text_file},
+        "corpus": {"weights": corpus.weights, "text_file": corpus.text_file, "lines": corpus.lines},
         "updated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     if previous and (previous.get("seed") != seed or previous.get("conditions") != asdict(ranges)):
