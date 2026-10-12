@@ -14,7 +14,7 @@
         "type" : "MultiArray"
       }
     ],
-    "version" : "202609301110",
+    "version" : "202610122134",
     "modelParameters" : [
 
     ],
@@ -60,15 +60,15 @@
       }
     ],
     "userDefinedMetadata" : {
-      "synthetic_val_cer" : "0.4706",
+      "com.github.apple.coremltools.source" : "torch==2.7.0",
+      "com.github.apple.coremltools.source_dialect" : "TorchScript",
+      "com.github.apple.coremltools.conversion_date" : "2026-10-12",
+      "training_step" : "8000",
       "vocabulary" : "[\"<blank>\", \" \", \"A\", \"B\", \"C\", \"D\", \"E\", \"F\", \"G\", \"H\", \"I\", \"J\", \"K\", \"L\", \"M\", \"N\", \"O\", \"P\", \"Q\", \"R\", \"S\", \"T\", \"U\", \"V\", \"W\", \"X\", \"Y\", \"Z\", \"0\", \"1\", \"2\", \"3\", \"4\", \"5\", \"6\", \"7\", \"8\", \"9\", \".\", \",\", \"?\", \"\/\", \"-\", \"@\", \"'\", \"<AR>\", \"<BT>\", \"<KN>\", \"<SK>\", \"<AS>\"]",
       "com.github.apple.coremltools.version" : "9.0",
-      "training_step" : "30000",
-      "com.github.apple.coremltools.source_dialect" : "TorchScript",
-      "com.github.apple.coremltools.conversion_date" : "2026-09-30",
-      "com.github.apple.coremltools.source" : "torch==2.7.0",
-      "source_checkpoint" : "runs\/full\/best.pt",
-      "w1aw_cer" : "0.0054",
+      "synthetic_val_cer" : "0.4650",
+      "source_checkpoint" : "runs\/ft-hand20-commas-farnv3\/last.pt",
+      "w1aw_cer" : "0.0074",
       "features" : "{\"sample_rate\": 8000, \"n_fft\": 256, \"hop\": 64, \"bin_lo\": 8, \"bin_hi\": 41, \"dynamic_range_db\": 60.0, \"time_stride\": 2, \"output_frame_s\": 0.016}",
       "parameters" : "528434"
     },

@@ -141,23 +141,48 @@ That writes `Sources/CWKit/Resources/CWNet.mlmodelc`, compiled with Xcode's `cor
 front end), and the golden files in `Tests/CWKitTests/Resources/Neural/`. Commit a new model only
 when it should ship, and tag a CWKit release so apps that depend on it pick it up.
 
-First model (30k steps full stage after 6k clean; 528k parameters):
+Current model (CWKit 0.2.0): the first model fine-tuned for 8k steps (lr 2e-4, seed 2) with 28%
+of samples drawn from two targeted cwsynth sets, made with the CWSynth app's job mode:
 
-| Test | CER |
-| --- | --- |
-| W1AW clips, clean | 0.54% |
-| W1AW whole sessions, streamed like the app | 1.19% (0–1% at 13 WPM and up) |
-| W1AW sessions at +3 dB | 3.35% |
-| W1AW clips with white noise at +12 / +6 / 0 / −6 dB | 0.8% / 1.2% / 14% / 98% |
-| Noise-only synthetic samples | 0.00 invented characters per sample |
+| Set | Clips | Conditions |
+| --- | --- | --- |
+| `hand-low-snr` | 5,000 | straight key and bug, −6 to +6 dB, 10–30 WPM, normal text mix |
+| `farnsworth-v3` | 2,000 | machine and paddle, characters 10–30 WPM, 80% Farnsworth at 0.3–0.9 of character speed, 0 to +25 dB, mostly short words, keyed part ≤ 16 s |
 
-Known weak spots: hand-sent code (straight key and bug 2.5–3× the machine error rate at good
-SNR), SNR below 0 dB, deep fading, and missing word spaces in extreme Farnsworth spacing
-(W1AW 5 WPM: 17% session CER, almost all missing spaces). It also outputs the comma twice
-(`,` → `,,`) at 18–19 WPM: half the time on clean code at 18 WPM (`cwmodel.repeats`), and in the
-18 WPM W1AW bulletins, which have most of the W1AW commas. Fine-tuning made it worse. Commas
-were 0.29% of training characters, only at sentence ends; the English source now also puts
-them between words (1.2%).
+```sh
+.venv/bin/python -m cwmodel.train --stage full --init runs/full/best.pt --steps 8000 --lr 2e-4 --seed 2 \
+    --extra-train data/hand-low-snr/train.jsonl --extra-train data/farnsworth-v3/train.jsonl --extra-share 0.28
+```
+
+Each set's exact conditions and seed are in its `dataset.json`. Keep extra-set clips to about 20 s:
+30 s clips exhausted the 16 GB Mac's shared GPU memory and training crawled.
+
+Both models measured with the same tools (W1AW sessions streamed like the app, comma rule on):
+
+| Test | First model | Current |
+| --- | --- | --- |
+| W1AW whole sessions, clean | 1.14% | **0.82%** |
+| W1AW sessions at +3 dB | 3.26% | **2.81%** |
+| … 5 / 7.5 / 10 WPM, clean | 17.0% / 6.2% / 6.0% | **13.1% / 0.9% / 4.2%** |
+| … 13 / 15 / 18 WPM, clean | **0.75%** / 0.18% / 0.45% | 1.12% / 0.24% / **0.35%** |
+| … 40 WPM at +3 dB | **4.2%** | 5.2% |
+| Hand-sent low-SNR set (500 val clips, straight key and bug, −6 to +6 dB) | 25.2% | **22.8%** |
+| Synthetic val set (all conditions) | 45.4% | **44.9%** |
+| W1AW clips, clean (no comma rule) | **0.60%** | 0.70% |
+| Noise-only synthetic samples | 0.00 | 0.00 invented characters per sample |
+
+First model, as originally measured (30k steps full stage after 6k clean; 528k parameters): W1AW
+clips 0.54%, sessions 1.19% clean and 3.35% at +3 dB, clips with white noise at +12 / +6 / 0 / −6 dB
+0.8% / 1.2% / 14% / 98%.
+
+Known weak spots: hand-sent code and SNR below 0 dB (still the largest errors), deep fading,
+missing word spaces in extreme Farnsworth spacing (W1AW 5 WPM: 13% session CER), and a small
+loss against the first model at clean 13 WPM and at 40 WPM in noise. Models can fire twice inside
+a comma at 18–19 WPM (`,` → `,,`); it swings between training runs of the same setup (27 and 69
+doubled W1AW clips), so the streaming decoder drops a repeated comma, as it does a repeated
+space. Clip evaluation and `cwmodel.repeats` decode without that rule, so they still show it.
+Commas used to be 0.29% of training characters, only at sentence ends; the English source now
+also puts them between words (1.2%).
 
 ## Modules
 
