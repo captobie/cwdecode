@@ -121,7 +121,10 @@ single long word can exceed the 15 s clip limit. Disk: about 220 MB of MP3s, 360
 Spectrogram → CNN → CTC, trained on cwsynth samples generated on the fly
 (`python -m cwmodel.train`; stages `clean` then `full`). `python -m cwmodel.evaluate` reports
 error rates by SNR, speed, fist and source; `python -m cwmodel.stream` decodes whole W1AW
-sessions the way the app does.
+sessions the way the app does. `python -m cwmodel.repeats --ckpt …` checks that the model
+doesn't output one character twice: it renders every character between two words as clean
+machine code at 10–40 WPM (1 WPM apart, several contexts) and counts doubles, in about 30 s
+per model. Run it on every candidate before shipping.
 
 Exporting for the app needs coremltools, whose native parts aren't built for Python 3.14, so it
 runs in a separate environment pinned to the torch version coremltools is tested against:
@@ -150,7 +153,11 @@ First model (30k steps full stage after 6k clean; 528k parameters):
 
 Known weak spots: hand-sent code (straight key and bug 2.5–3× the machine error rate at good
 SNR), SNR below 0 dB, deep fading, and missing word spaces in extreme Farnsworth spacing
-(W1AW 5 WPM: 17% session CER, almost all missing spaces).
+(W1AW 5 WPM: 17% session CER, almost all missing spaces). It also outputs the comma twice
+(`,` → `,,`) at 18–19 WPM: half the time on clean code at 18 WPM (`cwmodel.repeats`), and in the
+18 WPM W1AW bulletins, which have most of the W1AW commas. Fine-tuning made it worse. Commas
+were 0.29% of training characters, only at sentence ends; the English source now also puts
+them between words (1.2%).
 
 ## Modules
 
@@ -170,5 +177,6 @@ SNR), SNR below 0 dB, deep fading, and missing word spaces in extreme Farnsworth
 | `cwmodel/net.py` | The network |
 | `cwmodel/data.py` | On-the-fly synthetic batches (length-bucketed), manifest readers |
 | `cwmodel/train.py`, `evaluate.py` | Training stages and error-rate breakdowns |
+| `cwmodel/repeats.py` | Checks that no character comes out twice at any speed |
 | `cwmodel/stream.py` | Windowed streaming decoding (the Swift `StreamingCTCDecoder` matches it) |
 | `cwmodel/export.py` | Core ML export and golden test files |

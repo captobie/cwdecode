@@ -76,3 +76,12 @@ def test_dataset_is_identical_for_any_worker_count(tmp_path):
     assert {"id", "audio", "text", "duration_s", "params", "alignment", "snr_db_2500hz"} <= set(row)
     with pytest.raises(FileExistsError):
         write_dataset(tmp_path / "a", 2, seed=7, workers=1, progress=False)
+
+
+def test_english_has_commas_between_words():
+    corpus = CorpusMix()
+    rng = np.random.default_rng(3)
+    texts = [corpus.english(rng) for _ in range(500)]
+    inside = sum(", " in t for t in texts)
+    assert inside > 100, "commas should appear mid-sentence, not only at the end"
+    assert all(normalize(t) == t and ",," not in t for t in texts)

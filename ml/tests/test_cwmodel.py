@@ -103,3 +103,25 @@ def test_extra_train_rejects_eval_data(tmp_path):
     (tmp_path / "w1aw" / "clips.jsonl").write_text('{"split": "train"}\n')
     with pytest.raises(ValueError, match="not a cwsynth dataset"):
         load_extra_train([tmp_path / "w1aw" / "clips.jsonl"])
+
+
+def test_repeat_check_counts_only_adjacent_copies():
+    from cwmodel.repeats import doubled
+    assert doubled("TEST ,, OK", ",")
+    assert doubled("TEST <BT><BT> OK", "<BT>")
+    assert not doubled("TEST , OK", ",")
+    assert not doubled("TEST , , OK", ",")
+    assert not doubled("TEST EE OK", ",")
+
+
+def test_repeat_check_runs_every_token_and_speed():
+    from cwmodel.repeats import check, clips
+    from cwsynth.alphabet import KEYED
+    from cwmodel.repeats import variants
+    items = clips([18.0, 25.0], tokens=[",", "O"])
+    counts = check(CwNet(), items, "cpu")
+    assert set(counts) == {(",", 18.0), (",", 25.0), ("O", 18.0), ("O", 25.0)}
+    assert counts[",", 18.0][1] == len(variants(","))
+    assert "OK , OK" in variants(",") and "FRIDAY, AT" in variants(",")
+    assert not any("OK" in v for v in variants("O")), "contexts containing the token are skipped"
+    assert len(clips([20.0])) == sum(len(variants(t)) for t in KEYED)

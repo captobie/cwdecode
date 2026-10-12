@@ -19,6 +19,8 @@ DEFAULT_WEIGHTS: dict[str, float] = {
 }
 
 _LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# Chance of a comma after each word but the last in the bundled English source.
+COMMA_PROB = 0.15
 
 # ITU prefixes (ported from HamLexicon). Ones ending in a digit already include the call area.
 PREFIXES = [
@@ -240,6 +242,12 @@ class CorpusMix:
             start = int(rng.integers(0, max(1, len(self.words) - count)))
             return " ".join(self.words[start:start + count])
         words = [_pick(rng, self.words) for _ in range(count)]
+        # Commas between words, as in prose and bulletins. The comma is the longest common
+        # character, and with commas only at sentence ends the first model doubled it at
+        # 18-19 WPM (see cwmodel/repeats.py).
+        for i in range(count - 1):
+            if rng.random() < COMMA_PROB:
+                words[i] += ","
         if rng.random() < 0.3:
             words[-1] += _pick(rng, [".", "?", ","])
         return " ".join(words)
