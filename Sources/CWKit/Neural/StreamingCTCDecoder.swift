@@ -19,6 +19,9 @@ final class StreamingCTCDecoder {
     static let minimumSamples = (CWNetModel.minimumFrames - 1) * NeuralFeatures.hop
     /// How far back before the handoff a new window's tokens are compared with committed text.
     static let reconcileWindow = 1.5
+    /// Tokens never sent twice in a row, so a second one is dropped. The comma is here because
+    /// models can fire twice inside one comma at 18–19 WPM (`ml/cwmodel/repeats.py`).
+    static let neverRepeated: Set<String> = [" ", ","]
 
     let window: Double
     let hop: Double
@@ -178,12 +181,17 @@ final class StreamingCTCDecoder {
         return ([], Array(after.prefix(already.count)) == already ? already.count : 0)
     }
 
-    /// Adds tokens to the committed text without leading or doubled spaces.
+    /// Whether `token` is dropped when it follows `last`.
+    static func dropsRepeat(_ token: String, after last: String) -> Bool {
+        token == last && neverRepeated.contains(token)
+    }
+
+    /// Adds tokens to the committed text without a leading space or a repeated space or comma.
     private func append(_ tokens: [String], times: [Double]) -> [String] {
         var added: [String] = []
         for (token, time) in zip(tokens, times) {
             let last = added.last ?? committed.last ?? " "
-            if token == " " && last == " " { continue }
+            if Self.dropsRepeat(token, after: last) { continue }
             added.append(token)
             recent.append((token, time))
         }

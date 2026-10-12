@@ -39,6 +39,9 @@ MIN_FRAMES = 64
 MIN_SAMPLES = (MIN_FRAMES - 1) * HOP
 # How far back before the handoff a new window's tokens are compared with committed text.
 RECONCILE_S = 1.5
+# Tokens never sent twice in a row, so a second one is dropped. The comma is here because
+# models can fire twice inside one comma at 18-19 WPM (cwmodel/repeats.py).
+NEVER_REPEATED = {SPACE, ","}
 
 Emission = tuple[str, float]                    # (token, absolute time in seconds)
 LogProbs = Callable[[torch.Tensor], np.ndarray]  # [bins, frames] → [out frames, classes]
@@ -88,6 +91,11 @@ def reconcile(previous: list[str], before: list[str], after: list[str]) -> tuple
         return before[j + 1:], 0
     already = previous[i + 1:] if j == len(before) - 1 else []
     return [], len(already) if after[:len(already)] == already else 0
+
+
+def drops_repeat(token: str, last: str) -> bool:
+    """Whether `token` is dropped when it follows `last`."""
+    return token == last and token in NEVER_REPEATED
 
 
 def handoff(times: list[float], lo: float, hi: float) -> float:
@@ -173,11 +181,11 @@ class StreamingDecoder:
         return new
 
     def _append(self, tokens: list[str], times: list[float]) -> list[str]:
-        """Adds tokens to the committed text without leading or doubled spaces."""
+        """Adds tokens to the committed text without a leading space or a repeated space or comma."""
         added = []
         for token, t in zip(tokens, times):
             last = (added or self.committed or [SPACE])[-1]
-            if token == SPACE and last == SPACE:
+            if drops_repeat(token, last):
                 continue
             added.append(token)
             self._recent.append((token, t))

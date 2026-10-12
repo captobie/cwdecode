@@ -101,6 +101,14 @@ struct NeuralDecoderTests {
         #expect(StreamingCTCDecoder.handoff(times: [], lo: 2, hi: 2) == 2)
     }
 
+    @Test func repeatedSpacesAndCommasAreDropped() {
+        #expect(StreamingCTCDecoder.dropsRepeat(",", after: ","))
+        #expect(StreamingCTCDecoder.dropsRepeat(" ", after: " "))
+        #expect(!StreamingCTCDecoder.dropsRepeat(",", after: " "))
+        #expect(!StreamingCTCDecoder.dropsRepeat("E", after: "E"))
+        #expect(!StreamingCTCDecoder.dropsRepeat("<BT>", after: "<BT>"))
+    }
+
     @Test func reconcileAddsMissedTokensAndSkipsRepeats() {
         // The earlier window committed "NOW"; the new one also sees " 5" before the handoff.
         let missed = StreamingCTCDecoder.reconcile(previous: ["N", "O", "W"], before: ["O", "W", " ", "5"], after: [" "])
