@@ -5,7 +5,7 @@ import PackageDescription
 // the CWDecode app in this repo and by other apps that bring their own audio.
 let package = Package(
     name: "CWKit",
-    platforms: [.macOS(.v15)],
+    platforms: [.macOS(.v15), .iOS(.v18)],
     products: [
         .library(name: "CWKit", targets: ["CWKit"]),
     ],
